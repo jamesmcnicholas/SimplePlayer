@@ -8,16 +8,17 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller">
    <center>
-      <TableView prefHeight="316.0" prefWidth="549.0" BorderPane.alignment="CENTER">
+      <TableView prefHeight="234.0" prefWidth="604.0" style="-fx-background-color: #4c4c4c; -fx-border-color: #606060;" BorderPane.alignment="CENTER">
         <columns>
-            <TableColumn prefWidth="107.0" text="Track #" />
-          <TableColumn prefWidth="282.0" text="Name" />
+            <TableColumn prefWidth="62.0" text="Track #" />
+          <TableColumn prefWidth="327.0" text="Name" />
           <TableColumn minWidth="0.0" prefWidth="148.0" text="Artist" />
             <TableColumn prefWidth="62.0" text="Length" />
         </columns>
@@ -45,29 +46,35 @@
       </MenuBar>
    </top>
    <left>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;" BorderPane.alignment="CENTER" />
    </left>
    <bottom>
-      <HBox alignment="TOP_CENTER" prefHeight="59.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="84.0" prefWidth="704.0" style="-fx-background-color: #696969;" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Label">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets right="5.0" top="10.0" />
-               </padding>
-            </Label>
-            <ProgressBar prefHeight="28.0" prefWidth="589.0" progress="0.0">
-               <padding>
-                  <Insets top="10.0" />
-               </padding></ProgressBar>
-            <Label text="duration">
-               <padding>
-                  <Insets left="5.0" top="10.0" />
-               </padding>
-            </Label>
+            <HBox alignment="TOP_CENTER" prefHeight="65.0" prefWidth="704.0">
+               <children>
+                  <Label text="0:00">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets right="5.0" top="10.0" />
+                     </padding>
+                  </Label>
+                  <ProgressBar prefHeight="28.0" prefWidth="589.0" progress="0.0">
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </ProgressBar>
+                  <Label text="song.length()">
+                     <padding>
+                        <Insets left="5.0" top="10.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </HBox>
+            <ToggleButton mnemonicParsing="false" text="ToggleButton" />
          </children>
-      </HBox>
+      </VBox>
    </bottom>
 </BorderPane>

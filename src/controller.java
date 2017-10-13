@@ -12,7 +12,5 @@ public class controller {
     @FXML protected void forgotPasswordButtonPress(ActionEvent event){
         System.out.println("forgot PRESSED");
     }
-    @FXML protected void createAccountButtonPress(ActionEvent event){
-        System.out.println("accout PRESSED");
-    }
+    @FXML protected void createAccountButtonPress(ActionEvent event){System.out.println("accout PRESSED");}
 }
