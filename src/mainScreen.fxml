@@ -14,16 +14,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller">
-   <center>
-      <TableView prefHeight="234.0" prefWidth="604.0" style="-fx-background-color: #4c4c4c; -fx-border-color: #606060;" BorderPane.alignment="CENTER">
-        <columns>
-            <TableColumn prefWidth="62.0" text="Track #" />
-          <TableColumn prefWidth="327.0" text="Name" />
-          <TableColumn minWidth="0.0" prefWidth="148.0" text="Artist" />
-            <TableColumn prefWidth="62.0" text="Length" />
-        </columns>
-      </TableView>
-   </center>
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -46,7 +36,7 @@
       </MenuBar>
    </top>
    <left>
-      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;" BorderPane.alignment="CENTER" />
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER" />
    </left>
    <bottom>
       <VBox prefHeight="84.0" prefWidth="704.0" style="-fx-background-color: #696969;" BorderPane.alignment="CENTER">
@@ -61,20 +51,48 @@
                         <Insets right="5.0" top="10.0" />
                      </padding>
                   </Label>
-                  <ProgressBar prefHeight="28.0" prefWidth="589.0" progress="0.0">
+                  <ProgressBar fx:id="progressBar" prefHeight="16.0" prefWidth="633.0" progress="0.44" style="-fx-accent: gray;">
                      <padding>
                         <Insets top="10.0" />
                      </padding>
                   </ProgressBar>
-                  <Label text="song.length()">
+                  <Label text="10:00">
                      <padding>
                         <Insets left="5.0" top="10.0" />
                      </padding>
                   </Label>
                </children>
             </HBox>
-            <ToggleButton mnemonicParsing="false" text="ToggleButton" />
+            <HBox alignment="CENTER" prefHeight="70.0" prefWidth="704.0">
+               <children>
+                  <ToggleButton fx:id="prevButton" mnemonicParsing="false" onAction="#prevButtonPressed" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="PREV" />
+                  <ToggleButton fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseButtonPressed" prefHeight="18.0" prefWidth="56.0" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="PAUSE">
+                     <HBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </HBox.margin></ToggleButton>
+                  <ToggleButton fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonPressed" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="NEXT" />
+               </children>
+            </HBox>
          </children>
       </VBox>
    </bottom>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="48.0" prefWidth="604.0">
+               <children>
+                  <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="41.0" prefWidth="567.0" text="Music Library - *User's Name*" />
+               </children>
+            </HBox>
+            <TableView fx:id="songTable" prefHeight="268.0" prefWidth="604.0" style="-fx-background-color: #4c4c4c; -fx-border-color: #606060;">
+              <columns>
+                  <TableColumn prefWidth="62.0" text="Track #" />
+                <TableColumn prefWidth="327.0" text="Name" />
+                <TableColumn minWidth="0.0" prefWidth="148.0" text="Artist" />
+                  <TableColumn prefWidth="62.0" text="Length" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
 </BorderPane>
