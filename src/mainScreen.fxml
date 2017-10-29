@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXProgressBar?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller">
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
+      <MenuBar style="-fx-background-color: #4c4c4c;" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -36,41 +39,87 @@
       </MenuBar>
    </top>
    <left>
-      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER" />
+      <VBox prefHeight="291.0" prefWidth="121.0" style="-fx-background-color: #232426;" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="searchField" prefHeight="33.0" prefWidth="117.0" promptText="Search" style="-fx-background-radius: 0; -fx-background-color: #232426;">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="2.0" right="2.0" top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <Button fx:id="addSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addSongButtonPressed" prefHeight="25.0" prefWidth="135.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="ADD SONG" textFill="WHITE">
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="removeSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSongButtonPressed" prefHeight="25.0" prefWidth="143.0" style="-fx-background-color: #232426;" text="REMOVE SONG" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font></Button>
+            <Button fx:id="queueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#queueButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="QUEUE" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font></Button>
+            <Button fx:id="playNextButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#playNextButtonPressed" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: #232426;" text="PLAY NEXT" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font></Button>
+            <Button fx:id="addToPlaylistButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addToPlaylistButtonPressed" prefHeight="25.0" prefWidth="152.0" style="-fx-background-color: #232426;" text="ADD TO PLAYLIST" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font>
+            </Button>
+         </children></VBox>
    </left>
    <bottom>
       <VBox prefHeight="84.0" prefWidth="704.0" style="-fx-background-color: #696969;" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="TOP_CENTER" prefHeight="65.0" prefWidth="704.0">
+            <HBox alignment="CENTER" prefHeight="65.0" prefWidth="704.0" style="-fx-background-color: #161719;">
                <children>
-                  <Label text="0:00">
+                  <Label text="0:00" textFill="WHITE">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
                      <padding>
-                        <Insets right="5.0" top="10.0" />
+                        <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <ProgressBar fx:id="progressBar" prefHeight="16.0" prefWidth="633.0" progress="0.44" style="-fx-accent: gray;">
+                  <JFXProgressBar fx:id="progressBar" prefHeight="11.0" prefWidth="625.0" progress="0.5" style="-fx-background-color: red; -fx-background-radius: 0; -fx-background-insets: 0;">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></JFXProgressBar>
+                  <Label text="10:00" textFill="WHITE">
                      <padding>
-                        <Insets top="10.0" />
-                     </padding>
-                  </ProgressBar>
-                  <Label text="10:00">
-                     <padding>
-                        <Insets left="5.0" top="10.0" />
+                        <Insets left="5.0" />
                      </padding>
                   </Label>
                </children>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="70.0" prefWidth="704.0">
+            <HBox alignment="CENTER" prefHeight="70.0" prefWidth="704.0" style="-fx-background-color: #232426;">
                <children>
-                  <ToggleButton fx:id="prevButton" mnemonicParsing="false" onAction="#prevButtonPressed" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="PREV" />
-                  <ToggleButton fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseButtonPressed" prefHeight="18.0" prefWidth="56.0" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="PAUSE">
+                  <ToggleButton fx:id="prevButton" mnemonicParsing="false" onAction="#prevButtonPressed" prefHeight="32.0" prefWidth="33.0" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="⏮" />
+                  <ToggleButton fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseButtonPressed" prefHeight="32.0" prefWidth="32.0" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="▶">
                      <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin></ToggleButton>
-                  <ToggleButton fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonPressed" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="NEXT" />
+                  <ToggleButton fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonPressed" prefHeight="32.0" prefWidth="32.0" style="-fx-background-radius: 100; -fx-background-color: #FFFFFF;" text="⏭">
+                     <font>
+                        <Font size="11.0" />
+                     </font></ToggleButton>
                </children>
             </HBox>
          </children>
@@ -79,17 +128,17 @@
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox prefHeight="48.0" prefWidth="604.0">
+            <HBox prefHeight="48.0" prefWidth="604.0" style="-fx-background-color: #232426;">
                <children>
-                  <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="41.0" prefWidth="567.0" text="Music Library - *User's Name*" />
+                  <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="36.0" prefWidth="640.0" style="-fx-background-color: #161719;" text="Music Library - *User's Name*" textFill="WHITE" />
                </children>
             </HBox>
-            <TableView fx:id="songTable" prefHeight="268.0" prefWidth="604.0" style="-fx-background-color: #4c4c4c; -fx-border-color: #606060;">
+            <TableView fx:id="songTable" prefHeight="256.0" prefWidth="619.0" style="-fx-background-color: #4c4c4c; -fx-border-color: #606060;">
               <columns>
-                  <TableColumn prefWidth="62.0" text="Track #" />
-                <TableColumn prefWidth="327.0" text="Name" />
-                <TableColumn minWidth="0.0" prefWidth="148.0" text="Artist" />
-                  <TableColumn prefWidth="62.0" text="Length" />
+                  <TableColumn prefWidth="69.0" text="Track #" />
+                <TableColumn prefWidth="302.0" text="Name" />
+                <TableColumn minWidth="0.0" prefWidth="157.0" text="Artist" />
+                  <TableColumn prefWidth="59.0" text="Length" />
               </columns>
             </TableView>
          </children>
