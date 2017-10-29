@@ -2,6 +2,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class GUI extends Application{
         stage.setTitle("Login Screen");
         stage.setResizable(false);
         stage.setScene(scene);
+        stage.getIcons().add(new Image("sp-logo.png"));
 
         stage.show();
     }
