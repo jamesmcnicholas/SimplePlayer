@@ -33,6 +33,5 @@ public class GUI extends Application{
         }catch (IOException e){
             e.printStackTrace();
         }
-
     }
 }
