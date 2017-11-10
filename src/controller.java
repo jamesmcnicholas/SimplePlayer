@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-
+//RENAME TO LOGIN CONTROLLER AND CREATE A SECOND CONTROLLER FOR MAIN
 public class controller {
 
     private GUI gui;
@@ -35,7 +35,7 @@ public class controller {
         Stage window = (Stage) ((Node)event.getSource()).getScene().getWindow();
 
         window.setScene(mainScreenScene);
-        window.getIcons().add(new Image("sp-logo.png"));
+        window.getIcons().add(new Image("sp-lo0go.png"));
         window.setTitle("Main Screen");
         window.show();
     }
