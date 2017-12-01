@@ -17,6 +17,5 @@ public class mainController{
 
         @FXML private TableView<SongView> songView;
         @FXML private TableColumn<SongView,ArtistData> artistColumn;
-        @FXML private TableColumn<SongView,TrackNumberColumn>
 
 }

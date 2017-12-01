@@ -6,6 +6,12 @@ public class UserData {
     private String password;
     private int accessLevel;
 
+    public UserData(int userID, String username,  String password, int accessLevel){
+        this.userID = userID;
+        this.username = username;
+        this. password = password;
+        this.accessLevel = accessLevel;
+    }
     //Getters and Setters
     public int getUserID() { return userID; }
     public void setUserID(int userID) { this.userID = userID; }
