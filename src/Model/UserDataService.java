@@ -69,7 +69,7 @@ public class UserDataService {
                 database.executeUpdate(statement);
             }
             else {
-                PreparedStatement statement = database.newStatement("UPDATE UserID SET userID, username, password, accessLevel = ?, WHERE userID = ?");
+                PreparedStatement statement = database.newStatement("UPDATE UserData SET userID, username, password, accessLevel = ?, WHERE userID = ?");
                 statement.setInt(1, itemToSave.getUserID());
                 statement.setString(2, itemToSave.getUsername());
                 statement.setString(3,itemToSave.getPassword());
@@ -82,7 +82,7 @@ public class UserDataService {
     }
 
 
-    public static void deeleteByID(int id, DatabaseConnection database){
+    public static void deleteByID(int id, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("DELETE FROM UserData WHERE UserID = ?");
 
         try {
