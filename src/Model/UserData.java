@@ -12,6 +12,13 @@ public class UserData {
         this. password = password;
         this.accessLevel = accessLevel;
     }
+
+    public UserData(String username, String password, int accessLevel) {
+        this.username = username;
+        this.password = password;
+        this.accessLevel = accessLevel;
+    }
+
     //Getters and Setters
     public int getUserID() { return userID; }
     public void setUserID(int userID) { this.userID = userID; }

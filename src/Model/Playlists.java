@@ -6,6 +6,13 @@ public class Playlists {
     private String playlistName;
     private int userID;
 
+    public Playlists(int playlistID, int playlistLength, String playlistName, int userID) {
+        this.playlistID = playlistID;
+        this.playlistLength = playlistLength;
+        this.playlistName = playlistName;
+        this.userID = userID;
+    }
+
     //Getters and Setters
     public int getPlaylistID() { return playlistID; }
     public void setPlaylistID(int playlistID) { this.playlistID = playlistID; }

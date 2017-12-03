@@ -61,19 +61,17 @@ public class UserDataService {
 
         try {
             if (existingItem == null) {
-                PreparedStatement statement = database.newStatement("INSERT INTO UserData (userID, username, password, accessLevel) VALUES (?, ?, ?, ?)");
-                statement.setInt(1, itemToSave.getUserID());
-                statement.setString(2, itemToSave.getUsername());
-                statement.setString(3,itemToSave.getPassword());
-                statement.setInt(4,itemToSave.getAccessLevel());
+                PreparedStatement statement = database.newStatement("INSERT INTO UserData (username, password, accessLevel) VALUES (?, ?, ?)");
+                statement.setString(1, itemToSave.getUsername());
+                statement.setString(2,itemToSave.getPassword());
+                statement.setInt(3,itemToSave.getAccessLevel());
                 database.executeUpdate(statement);
             }
             else {
-                PreparedStatement statement = database.newStatement("UPDATE UserData SET userID, username, password, accessLevel = ?, WHERE userID = ?");
-                statement.setInt(1, itemToSave.getUserID());
-                statement.setString(2, itemToSave.getUsername());
-                statement.setString(3,itemToSave.getPassword());
-                statement.setInt(4,itemToSave.getAccessLevel());
+                PreparedStatement statement = database.newStatement("UPDATE UserData SET username, password, accessLevel = ?, WHERE userID = ?");
+                statement.setString(1, itemToSave.getUsername());
+                statement.setString(2,itemToSave.getPassword());
+                statement.setInt(3,itemToSave.getAccessLevel());
                 database.executeUpdate(statement);
             }
         } catch (SQLException resultsException) {

@@ -1,3 +1,5 @@
+package Controller;
+
 import Model.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

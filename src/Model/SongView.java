@@ -3,10 +3,12 @@ package Model;
 import javafx.beans.property.SimpleStringProperty;
 
 public class SongView {
+
     private int id;
     private int length;
     private final SimpleStringProperty name;
     private final SimpleStringProperty artist;
+
     public SongView(int id,String name, String artist,int length){
         this.id=id;
         this.name=new SimpleStringProperty(name);

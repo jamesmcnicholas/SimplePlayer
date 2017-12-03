@@ -21,7 +21,7 @@ public class Main extends Application{
     public void start(Stage stage)throws Exception{
         database = new DatabaseConnection("SQL/SimplePlayer.db");
 
-        Parent root = FXMLLoader.load(getClass().getResource("LoginScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("Controller/LoginScreen.fxml"));
         Scene scene = new Scene(root,350,200);
         stage.setTitle("Login Screen");
         stage.setResizable(false);
