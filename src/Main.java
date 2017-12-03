@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class Main extends Application{
 
+
     public static void main(String args[]){launch(args);}
 
     public static DatabaseConnection database;
@@ -54,6 +55,8 @@ public class Main extends Application{
 
 
         //TEST CODE END
+
+
     }
 
 }

@@ -52,12 +52,8 @@ public class loginController {
             if(usernameField.getText().equals(u.getUsername())) {
                 if (generateHash(passwordField.getText()).equals(u.getPassword())) {
 
-                    //todo.Implement a password hash checking system
-                    // System.out.println(generateHash(passwordField.getText()));
-
                     Parent mainScreenParent = FXMLLoader.load(getClass().getResource("mainScreen.fxml"));
                     Scene mainScreenScene = new Scene(mainScreenParent);
-
                     //This line gets the stage info
                     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
@@ -66,6 +62,7 @@ public class loginController {
                     window.setTitle("Main Screen");
                     window.show();
                     loggedIn = true;
+                    break;
                 } else {
                     System.out.println("Incorrect Password"); //todo.DEVELOP INTO DIALOG-POPUP
                 }
