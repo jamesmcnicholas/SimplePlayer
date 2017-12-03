@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static Model.DatabaseConnection.deleteFromTable;
+
 public class TrackDataService {
     public static void selectAll(List<TrackData> targetList, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID FROM TrackData ORDER BY trackID");
@@ -66,7 +68,7 @@ public class TrackDataService {
                 database.executeUpdate(statement);
             }
             else {
-                PreparedStatement statement = database.newStatement("UPDATE TrackData SET trackID, trackName, length, artistID = ?, WHERE userID = ?");
+                PreparedStatement statement = database.newStatement("UPDATE TrackData SET trackID, trackName, length, artistID = ?, WHERE trackID = ?");
                 statement.setInt(1, itemToSave.getTrackID());
                 statement.setString(2, itemToSave.getTrackName());
                 statement.setInt(3,itemToSave.getLength());
@@ -80,14 +82,7 @@ public class TrackDataService {
 
 
     public static void deleteByID(int id, DatabaseConnection database){
-        PreparedStatement statement = database.newStatement("DELETE FROM TrackData WHERE UserID = ?");
-        try {
-            if (statement != null) {
-                statement.setInt(1, id);
-                database.executeUpdate(statement);
-            }
-        } catch (SQLException resultsException) {
-            System.out.println("Database deletion error: " + resultsException.getMessage());
-        }
+        PreparedStatement statement = database.newStatement("DELETE FROM TrackData WHERE trackID = ?");
+        deleteFromTable(id,database,statement);
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 public class PlaylistTracksService {
     
     public static void selectAll(List<PlaylistTracks> targetList, DatabaseConnection database){
-
+        //todo.Implement playlist tracks service class
     }
     public static PlaylistTracks selectByID(int id, DatabaseConnection database){ return null;}//change eventually
     public static void save(PlaylistTracks PlaylistTracks, DatabaseConnection database){}

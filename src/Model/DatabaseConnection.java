@@ -75,4 +75,16 @@ public class DatabaseConnection {
         }
     }
 
+    //Generic method for deleting by ID
+    public static void deleteFromTable(int id, DatabaseConnection database, PreparedStatement statement){
+        try {
+            if (statement != null) {
+                statement.setInt(1, id);
+                database.executeUpdate(statement);
+            }
+        } catch (SQLException resultsException) {
+            System.out.println("Database deletion error: " + resultsException.getMessage());
+        }
+    }
+
 }

@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static Model.DatabaseConnection.deleteFromTable;
+
 public class UserDataService {
     public static void selectAll(List<UserData> targetList, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("SELECT userID, username, password, accessLevel FROM UserData ORDER BY userID");
@@ -82,14 +84,6 @@ public class UserDataService {
 
     public static void deleteByID(int id, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("DELETE FROM UserData WHERE UserID = ?");
-
-        try {
-            if (statement != null) {
-                statement.setInt(1, id);
-                database.executeUpdate(statement);
-            }
-        } catch (SQLException resultsException) {
-            System.out.println("Database deletion error: " + resultsException.getMessage());
-        }
+        deleteFromTable(id,database,statement);
     }
 }

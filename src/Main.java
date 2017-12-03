@@ -8,6 +8,9 @@ import javafx.scene.*;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 
@@ -55,7 +58,6 @@ public class Main extends Application{
 
 
         //TEST CODE END
-
 
     }
 

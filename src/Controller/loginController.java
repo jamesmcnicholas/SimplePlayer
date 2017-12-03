@@ -51,16 +51,7 @@ public class loginController {
         for (UserData u:userList){
             if(usernameField.getText().equals(u.getUsername())) {
                 if (generateHash(passwordField.getText()).equals(u.getPassword())) {
-
-                    Parent mainScreenParent = FXMLLoader.load(getClass().getResource("mainScreen.fxml"));
-                    Scene mainScreenScene = new Scene(mainScreenParent);
-                    //This line gets the stage info
-                    Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-                    window.setScene(mainScreenScene);
-                    window.getIcons().add(new Image("sp-logo.png"));
-                    window.setTitle("Main Screen");
-                    window.show();
+                    login(event, u);
                     loggedIn = true;
                     break;
                 } else {
@@ -86,9 +77,25 @@ public class loginController {
         }
     }
 
-    public static void main(String[] args)
-    {
-        String text = " ";
-        System.out.println(text + " --> " + generateHash(text));
+    public void login(ActionEvent event,UserData u){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("mainScreen.fxml"));
+            Parent mainScreenParent = loader.load();
+
+            Scene mainScreenScene = new Scene(mainScreenParent);
+            mainController controller = loader.getController();
+            controller.intitData(u);
+
+            //This line gets the stage info
+            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            window.setScene(mainScreenScene);
+            window.getIcons().add(new Image("sp-logo.png"));
+            window.setTitle("Main Screen");
+            window.show();
+        }catch(IOException e){
+            System.out.println("Error: "+e.getMessage()+e.getCause());
+        }
     }
 }
