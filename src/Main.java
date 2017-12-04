@@ -41,7 +41,7 @@ public class Main extends Application{
         UserDataService.selectAll(userList, database);
         //returns the details of every user in the database
         for (UserData u:userList){
-            System.out.println(u.getUserID()+", Name: "+u.getUsername()+", Password: "+u.getPassword()+", Access Level: "+u.getAccessLevel());
+            System.out.println(u.getUserID()+", Username: "+u.getUsername()+", Password: "+u.getPassword()+", Access Level: "+u.getAccessLevel());
         }
         System.out.println("");
 

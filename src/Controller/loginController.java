@@ -32,37 +32,52 @@ public class loginController {
     @FXML protected void forgotPasswordButtonPress(ActionEvent event){
         System.out.println("forgot PRESSED");
     }
-    @FXML protected void createAccountButtonPress(ActionEvent event){
-        if(userList.contains(usernameField.getText())){
-            System.out.println("User exists, try logging in!");
-        }else{
+    @FXML protected void createAccountButtonPress(ActionEvent event) {
+        UserDataService.selectAll(userList, database);
+        boolean accountExists = false;
+        //if(userList.contains(usernameField.getText())){
+        for (UserData u : userList) {
+            if ((u.getUsername().equals(usernameField.getText()))) {
+                accountExists=true;
+                break;
+            }
+        }
+        if(!accountExists) {
             String passHash = generateHash(passwordField.getText());
-            UserData newUser = new UserData(usernameField.getText(),passHash,1);
-            UserDataService.save(newUser,database);
+            UserData newUser = new UserData(usernameField.getText(), passHash, 1);
+            UserDataService.save(newUser, database);
             System.out.println("Account Created, try logging in!");
+        }else{
+            System.out.println("User exists, try logging in!");
         }
     }
 
     //Method to change the scene to the main screen
     @FXML public void loginButtonPushed(ActionEvent event) throws IOException {
+
         UserDataService.selectAll(userList, database);
         boolean loggedIn = false;
+        boolean invalidPass = false;
+
         //returns the details of every user in the database
-        for (UserData u:userList){
-            if(usernameField.getText().equals(u.getUsername())) {
+        for (UserData u:userList) {
+            if (usernameField.getText().equals(u.getUsername())) {
                 if (generateHash(passwordField.getText()).equals(u.getPassword())) {
                     login(event, u);
                     loggedIn = true;
+                    invalidPass = false;
                     break;
                 } else {
-                    System.out.println("Incorrect Password"); //todo.DEVELOP INTO DIALOG-POPUP
+                    invalidPass = true;
                 }
             }
         }
-        if(!loggedIn) {
+            if(invalidPass){
+                System.out.println("Incorrect Password"); //todo.DEVELOP INTO DIALOG-POPUP
+            } else if(!loggedIn) {
             System.out.println("Invalid username, try creating an account");
+            }
         }
-    }
 
 
     //Method used for hashing passwords with the SHA-1 algorithm
