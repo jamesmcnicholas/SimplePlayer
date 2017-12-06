@@ -84,12 +84,13 @@ public class loginController {
     public static String generateHash(String text)
     {
         try {
-            MessageDigest hasher = MessageDigest.getInstance("SHA-1");
+            MessageDigest hasher = MessageDigest.getInstance("SHA-256");
             hasher.update(text.getBytes());
             return DatatypeConverter.printHexBinary(hasher.digest()).toUpperCase();
         } catch (NoSuchAlgorithmException nsae) {
             return nsae.getMessage();
         }
+        //todo.Implement a salt for further security
     }
 
     public void login(ActionEvent event,UserData u){
