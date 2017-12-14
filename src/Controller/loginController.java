@@ -35,7 +35,6 @@ public class loginController {
     @FXML protected void createAccountButtonPress(ActionEvent event) {
         UserDataService.selectAll(userList, database);
         boolean accountExists = false;
-        //if(userList.contains(usernameField.getText())){
         for (UserData u : userList) {
             if ((u.getUsername().equals(usernameField.getText()))) {
                 accountExists=true;

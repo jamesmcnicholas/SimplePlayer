@@ -6,7 +6,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 public class mainController{
 
@@ -17,8 +25,15 @@ public class mainController{
     @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
     @FXML protected void prevButtonPressed(ActionEvent event){ System.out.println("prev pressed"); }
     @FXML protected void pauseButtonPressed(ActionEvent event){ System.out.println("pause pressed"); }
-    @FXML protected void queueButtonPressed(ActionEvent event){ System.out.println("queued song"); }
-    @FXML protected void addSongButtonPressed(ActionEvent event){ System.out.println("add song pressed"); }
+    @FXML protected void queueButtonPressed(ActionEvent event){ }
+    @FXML protected void addSongButtonPressed(ActionEvent event){
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        configureFileChooser(fileChooser);
+        File file = fileChooser.showOpenDialog(stage);
+        System.out.println(file);
+    }
     @FXML protected void removeSongButtonPressed(ActionEvent event){ System.out.println("song remove pressed"); }
     @FXML protected void playNextButtonPressed(ActionEvent event){ System.out.println("song will play next"); }
     @FXML protected void addToPlaylistButtonPressed(ActionEvent event){ System.out.println("added to playlist"); }
@@ -41,4 +56,39 @@ public class mainController{
          */
         //ArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Hello there"));
     }
+
+    private static void configureFileChooser(final FileChooser fileChooser) {
+        fileChooser.setTitle("View Music");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All Music Files", "*.*"),
+                new FileChooser.ExtensionFilter("MP3", "*.mp3"),
+                new FileChooser.ExtensionFilter("WAV", "*.wav")
+        );
+    }
+
+    private static void addFile(File file){
+        //TrackData newTrack = new TrackData();
+        //file.getName();
+        //todo.Find a way to get track metadata and push to db
+    }
+
+    /*private static void getDurationWithMp3Spi(File file) throws UnsupportedAudioFileException, IOException {
+
+        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
+        if (fileFormat instanceof TAudioFileFormat) {
+            Map<?, ?> properties = ((TAudioFileFormat) fileFormat).properties();
+            String key = "duration";
+            Long microseconds = (Long) properties.get(key);
+            int mili = (int) (microseconds / 1000);
+            int sec = (mili / 1000) % 60;
+            int min = (mili / 1000) / 60;
+            System.out.println("time = " + min + ":" + sec);
+        } else {
+            throw new UnsupportedAudioFileException();
+        }
+
+
+    }
+     */
 }
