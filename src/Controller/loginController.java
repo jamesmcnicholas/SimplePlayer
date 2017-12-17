@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.xml.bind.DatatypeConverter;
 
+
 public class loginController {
 
     private DatabaseConnection database = new DatabaseConnection("SQL/SimplePlayer.db");
