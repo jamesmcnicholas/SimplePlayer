@@ -1,13 +1,12 @@
 package Controller;
 
 import Model.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.media.Media;
 
 import javafx.stage.FileChooser;
@@ -24,10 +23,16 @@ public class mainController{
     private DatabaseConnection database = new DatabaseConnection("SQL/SimplePlayer.db");
     private UserData user;
 
+
+    @FXML private Label volumeLabel;
     @FXML private Label nameDisplayLabel;
     @FXML private ProgressBar progressBar;
+    @FXML private Slider volumeSlider;
+    @FXML private Label lengthLabel;
     @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
     @FXML protected void prevButtonPressed(ActionEvent event){ System.out.println("prev pressed"); }
+    @FXML protected void  volumeSliderDragged(ActionEvent event) {
+    }
 
     @FXML protected void pauseButtonPressed(ActionEvent event){
         if(paused){
@@ -52,6 +57,7 @@ public class mainController{
         File file = fileChooser.showOpenDialog(stage);
         System.out.println(file);
 
+
         //Loads file into MusicPlayer
         try{
             Media pick = new Media(file.toURI().toURL().toString());
@@ -75,6 +81,17 @@ public class mainController{
     public void intitData(UserData user){
         this.user = user;
         nameDisplayLabel.setText("Music Library - "+this.user.getUsername());
+        volumeSlider.setMin(0);
+        volumeSlider.setMax(100);
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable,
+                                Number oldValue, Number newValue) {
+                volumeLabel.setText("VOLUME: "+newValue.intValue()+"%");
+                player.setVolume(newValue.doubleValue()/100);
+                System.out.println("Volume set to: "+newValue.doubleValue()/100);
+            }
+        });
     }
 
     public void initialize(){

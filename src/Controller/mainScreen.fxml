@@ -7,16 +7,20 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
    <top>
       <MenuBar nodeOrientation="LEFT_TO_RIGHT" style="-fx-background-color: #696969;" BorderPane.alignment="CENTER">
         <menus>
@@ -83,6 +87,32 @@
                   <Font name="Microsoft Tai Le Bold" size="12.0" />
                </font>
             </Button>
+            <Slider fx:id="volumeSlider" max="1.0" onDragDropped="#volumeSliderDragged" prefHeight="34.0" prefWidth="121.0" value="1.0">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+               <effect>
+                  <Shadow blurType="GAUSSIAN" color="WHITE" height="0.0" radius="0.0" width="0.0">
+                     <input>
+                        <Lighting>
+                           <bumpInput>
+                              <Shadow />
+                           </bumpInput>
+                           <light>
+                           </light>
+                        </Lighting>
+                     </input>
+                  </Shadow>
+               </effect>
+            </Slider>
+            <Label fx:id="volumeLabel" prefHeight="26.0" prefWidth="121.0" text="VOLUME:" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Microsoft Tai Le Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="7.0" />
+               </padding>
+            </Label>
          </children></VBox>
    </left>
    <bottom>
@@ -98,11 +128,14 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <ProgressBar fx:id="progressBar" prefHeight="11.0" prefWidth="625.0" progress="0.5" style="-fx-background-color: red; -fx-background-radius: 0; -fx-background-insets: 0;">
+                  <ProgressBar fx:id="progressBar" prefHeight="11.0" prefWidth="625.0" progress="0.5" style="-fx-background-color: #161719; -fx-background-radius: 101;">
                      <HBox.margin>
                         <Insets />
-                     </HBox.margin></ProgressBar>
-                  <Label text="10:00" textFill="WHITE">
+                     </HBox.margin>
+                     <effect>
+                        <ColorAdjust hue="-0.37" />
+                     </effect></ProgressBar>
+                  <Label fx:id="lengthLabel" text="10:00" textFill="WHITE">
                      <padding>
                         <Insets left="5.0" />
                      </padding>

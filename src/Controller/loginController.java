@@ -108,7 +108,7 @@ public class loginController {
 
             window.setScene(mainScreenScene);
             window.getIcons().add(new Image("sp-logo.png"));
-            window.setTitle("Main Screen");
+            window.setTitle("SimplePlayer Library");
             window.show();
         }catch(IOException e){
             System.out.println("Error: "+e.getMessage()+e.getCause());
