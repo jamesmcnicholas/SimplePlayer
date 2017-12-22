@@ -1,8 +1,7 @@
 package Controller;
 
 import Model.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -26,9 +25,27 @@ public class mainController{
 
     @FXML private Label volumeLabel;
     @FXML private Label nameDisplayLabel;
-    @FXML private ProgressBar progressBar;
+    @FXML private Slider progressBar;
     @FXML private Slider volumeSlider;
+    @FXML private Label currentSongText;
+    @FXML private Label currentTimeLabel;
     @FXML private Label lengthLabel;
+
+    public void intitData(UserData user) {
+        this.user = user;
+        nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
+
+
+        volumeSlider.setMin(0);
+        volumeSlider.setMax(100);
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            volumeLabel.setText("VOLUME: " + newValue.intValue() + "%");
+            player.setVolume(newValue.doubleValue() / 100);
+        });
+
+        progressBar.setMin(0);
+    }
+
     @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
     @FXML protected void prevButtonPressed(ActionEvent event){ System.out.println("prev pressed"); }
     @FXML protected void  volumeSliderDragged(ActionEvent event) {
@@ -48,7 +65,7 @@ public class mainController{
 
     @FXML protected void queueButtonPressed(ActionEvent event){ }
 
-    @FXML protected void addSongButtonPressed(ActionEvent event){
+    @FXML protected void addSongButtonPressed(ActionEvent event) {
         //Opens file explorer and gets PATH to music
         Stage stage = new Stage();
         FileChooser fileChooser = new FileChooser();
@@ -56,15 +73,29 @@ public class mainController{
         configureFileChooser(fileChooser);
         File file = fileChooser.showOpenDialog(stage);
         System.out.println(file);
+        currentSongText.setText("Now playing - " + file.getName());
 
 
         //Loads file into MusicPlayer
-        try{
+        try {
             Media pick = new Media(file.toURI().toURL().toString());
             player = new MediaPlayer(pick);
+
+            player.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                progressBar.setValue(newValue.toSeconds());
+                currentTimeLabel.setText(Long.toString(Math.round(newValue.toSeconds())));
+            });
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
+        player.setOnReady(() -> {
+            progressBar.setMax(player.getTotalDuration().toSeconds());
+            lengthLabel.setText(Long.toString(Math.round(player.getTotalDuration().toSeconds())));
+            paused=true;
+            //todo.implement scrubbing
+        });
     }
 
 
@@ -78,21 +109,7 @@ public class mainController{
     @FXML private TableColumn<SongView,String> ArtistColumn;
     @FXML private TableColumn<SongView,Integer> lengthColumn;
 
-    public void intitData(UserData user){
-        this.user = user;
-        nameDisplayLabel.setText("Music Library - "+this.user.getUsername());
-        volumeSlider.setMin(0);
-        volumeSlider.setMax(100);
-        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable,
-                                Number oldValue, Number newValue) {
-                volumeLabel.setText("VOLUME: "+newValue.intValue()+"%");
-                player.setVolume(newValue.doubleValue()/100);
-                System.out.println("Volume set to: "+newValue.doubleValue()/100);
-            }
-        });
-    }
+
 
     public void initialize(){
         /*
@@ -116,24 +133,6 @@ public class mainController{
         //todo.Find a way to get track metadata and push to db
     }
 
-    /*private static void getDurationWithMp3Spi(File file) throws UnsupportedAudioFileException, IOException {
-
-        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
-        if (fileFormat instanceof TAudioFileFormat) {
-            Map<?, ?> properties = ((TAudioFileFormat) fileFormat).properties();
-            String key = "duration";
-            Long microseconds = (Long) properties.get(key);
-            int mili = (int) (microseconds / 1000);
-            int sec = (mili / 1000) % 60;
-            int min = (mili / 1000) / 60;
-            System.out.println("time = " + min + ":" + sec);
-        } else {
-            throw new UnsupportedAudioFileException();
-        }
-
-
-    }
-     */
 }
 
 
