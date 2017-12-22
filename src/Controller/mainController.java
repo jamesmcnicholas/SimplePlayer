@@ -12,8 +12,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javafx.scene.media.MediaPlayer;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 
 public class mainController{
 
@@ -21,6 +24,7 @@ public class mainController{
     private boolean paused;
     private DatabaseConnection database = new DatabaseConnection("SQL/SimplePlayer.db");
     private UserData user;
+    File cwd = new File("Songs/").getAbsoluteFile();
 
 
     @FXML private Label volumeLabel;
@@ -38,10 +42,13 @@ public class mainController{
 
         volumeSlider.setMin(0);
         volumeSlider.setMax(100);
+        volumeSlider.setValue(100);
+        volumeLabel.setText("VOLUME: 100%");
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             volumeLabel.setText("VOLUME: " + newValue.intValue() + "%");
             player.setVolume(newValue.doubleValue() / 100);
         });
+
 
         progressBar.setMin(0);
     }
@@ -73,10 +80,20 @@ public class mainController{
         configureFileChooser(fileChooser);
         File file = fileChooser.showOpenDialog(stage);
         System.out.println(file);
+
+        try {
+            copy(file,cwd);
+            System.out.println("test");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            System.out.println(e.getStackTrace());
+        }
+
+        /**
+         * This should be moved to a play method
+         */
         currentSongText.setText("Now playing - " + file.getName());
-
-
-        //Loads file into MusicPlayer
         try {
             Media pick = new Media(file.toURI().toURL().toString());
             player = new MediaPlayer(pick);
@@ -133,6 +150,10 @@ public class mainController{
         //todo.Find a way to get track metadata and push to db
     }
 
+
+    public static void copy(File source, File cwd) throws IOException {
+        FileUtils.copyFileToDirectory(source,cwd);
+    }
 }
 
 
