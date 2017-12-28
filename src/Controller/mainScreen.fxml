@@ -11,7 +11,8 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.effect.Light.Distant?>
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.layout.BorderPane?>
@@ -65,7 +66,7 @@
                   <Font name="Microsoft Tai Le Bold" size="12.0" />
                </font>
             </Button>
-            <Slider fx:id="volumeSlider" max="1.0" onDragDropped="#volumeSliderDragged" prefHeight="34.0" prefWidth="121.0" value="1.0">
+            <Slider fx:id="volumeSlider" max="1.0" prefHeight="34.0" prefWidth="121.0" value="1.0">
                <VBox.margin>
                   <Insets left="5.0" right="5.0" />
                </VBox.margin>
@@ -108,7 +109,11 @@
                   </Label>
                   <Slider fx:id="progressBar" prefHeight="14.0" prefWidth="628.0">
                      <effect>
-                        <ColorAdjust saturation="1.0" />
+                        <Lighting bumpInput="$null">
+                           <light>
+                              <Light.Distant azimuth="0.0" color="#00ffd0" elevation="86.86" />
+                           </light>
+                        </Lighting>
                      </effect>
                   </Slider>
                   <Label fx:id="lengthLabel" text="10:00" textFill="WHITE">
@@ -153,7 +158,7 @@
       </VBox>
    </center>
    <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="704.0" style="-fx-background-color: #161719;" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER" prefHeight="0.0" prefWidth="704.0" style="-fx-background-color: #161719;" BorderPane.alignment="CENTER">
          <children>
             <MenuBar prefHeight="49.0" prefWidth="132.0" style="-fx-background-color: #161719;">
               <menus>
@@ -169,15 +174,18 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="594.0">
+            <HBox prefHeight="25.0" prefWidth="594.0">
                <children>
-                  <Label fx:id="currentSongText" prefHeight="21.0" prefWidth="557.0" text="Not currently playing any media" textAlignment="CENTER" textFill="WHITE">
+                  <Label fx:id="currentSongText" prefHeight="25.0" prefWidth="640.0" text="Not currently playing any media" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="Microsoft Tai Le" size="15.0" />
                      </font>
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
+                     <effect>
+                        <Glow level="1.0" />
+                     </effect>
                   </Label>
                </children>
             </HBox>
