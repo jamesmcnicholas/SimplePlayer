@@ -7,8 +7,7 @@ public class TrackData {
     private int artistID;
 
 
-    public TrackData(int trackID, String trackName, int length, int artistID) {
-        this.trackID = trackID;
+    public TrackData(String trackName, int length, int artistID) {
         this.trackName = trackName;
         this.length = length;
         this.artistID = artistID;

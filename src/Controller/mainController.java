@@ -50,13 +50,15 @@ public class mainController{
         });
 
 
+        progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
+            player.setCycleCount(newValue.intValue() / 100);
+        });
+
         progressBar.setMin(0);
     }
 
     @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
     @FXML protected void prevButtonPressed(ActionEvent event){ System.out.println("prev pressed"); }
-    @FXML protected void  volumeSliderDragged(ActionEvent event) {
-    }
 
     @FXML protected void pauseButtonPressed(ActionEvent event){
         if(paused){
@@ -82,12 +84,12 @@ public class mainController{
         System.out.println(file);
 
         try {
+            System.out.println("Length of file: "+Files.getAttribute(file.toPath(),"Length"));
+
             copy(file,cwd);
             System.out.println("test");
         }catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            System.out.println(e.getStackTrace());
         }
 
         /**
@@ -99,7 +101,9 @@ public class mainController{
             player = new MediaPlayer(pick);
 
             player.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                progressBar.setValue(newValue.toSeconds());
+                if(!paused) {
+                    progressBar.setValue(newValue.toSeconds());
+                }
                 currentTimeLabel.setText(Long.toString(Math.round(newValue.toSeconds())));
             });
 
