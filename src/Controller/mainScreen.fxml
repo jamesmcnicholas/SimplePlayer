@@ -107,7 +107,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Slider fx:id="progressBar" prefHeight="14.0" prefWidth="628.0">
+                  <Slider fx:id="progressBar" onDragDetected="#progressDragDropped" prefHeight="14.0" prefWidth="628.0">
                      <effect>
                         <Lighting bumpInput="$null">
                            <light>
