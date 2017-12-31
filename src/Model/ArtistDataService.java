@@ -18,8 +18,8 @@ public class ArtistDataService {
                 if(results!=null){
                     while(results.next()){
                         targetList.add(new ArtistData(
-                                results.getInt("artistID"),
-                                results.getString("artistName")
+                                results.getString("artistName"),
+                                results.getInt("artistID")
                         ));
                     }
                 }
@@ -40,8 +40,8 @@ public class ArtistDataService {
 
                 if (results != null) {
                     result = new ArtistData(
-                            results.getInt("artistID"),
-                            results.getString("artistName"));
+                            results.getString("artistName"),
+                            results.getInt("artistID"));
 
                 }
             }
@@ -50,20 +50,20 @@ public class ArtistDataService {
         }
         return result;
     }
+
+
     public static void save(ArtistData itemToSave, DatabaseConnection database){
         ArtistData existingItem = null;
         if (itemToSave.getArtistID() != 0) existingItem = selectByID(itemToSave.getArtistID(), database);
 
         try {
             if (existingItem == null) {
-                PreparedStatement statement = database.newStatement("INSERT INTO ArtistData (artistID, artistName) VALUES (?, ?)");
-                statement.setInt(1, itemToSave.getArtistID());
-                statement.setString(2, itemToSave.getArtistName());
+                PreparedStatement statement = database.newStatement("INSERT INTO ArtistData (artistName) VALUES (?)");
+                statement.setString(1, itemToSave.getArtistName());
                 database.executeUpdate(statement);
             }
             else {
                 PreparedStatement statement = database.newStatement("UPDATE ArtistData SET artistID, artistName = ?, WHERE artistID = ?");
-                statement.setInt(1, itemToSave.getArtistID());
                 statement.setString(2, itemToSave.getArtistName());
                 database.executeUpdate(statement);
             }

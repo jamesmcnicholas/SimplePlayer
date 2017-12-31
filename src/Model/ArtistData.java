@@ -4,8 +4,12 @@ public class ArtistData {
     private int artistID;
     private String artistName;
 
-    public ArtistData(int artistID, String artistName) {
+    public ArtistData(String artistName,int artistID) {
         this.artistID = artistID;
+        this.artistName = artistName;
+    }
+
+    public ArtistData(String artistName) {
         this.artistName = artistName;
     }
 

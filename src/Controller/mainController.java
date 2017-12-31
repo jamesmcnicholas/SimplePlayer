@@ -228,9 +228,10 @@ public class mainController{
                 return a.getArtistID();
             }
         }
-        System.out.println("Artist not found");
-        return -1;
-        //todo.Add the artist here if they don't exist!
+        ArtistData newArtist = new ArtistData((artist));
+        ArtistDataService.save(newArtist,database);
+        System.out.println("Artist not found, adding to database");
+        return getArtistID(artist);
     }
 
     public int convertToSeconds(double milli){
