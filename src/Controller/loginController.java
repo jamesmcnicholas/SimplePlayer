@@ -1,8 +1,6 @@
 package Controller;
 
-import Model.DatabaseConnection;
-import Model.UserData;
-import Model.UserDataService;
+import Model.*;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +22,7 @@ import javax.xml.bind.DatatypeConverter;
 
 public class loginController {
 
-    private DatabaseConnection database = new DatabaseConnection("SQL/SimplePlayer.db");
+    private DatabaseConnection database;
     ArrayList<UserData> userList = new ArrayList<>();
 
     @FXML private TextField usernameField;
@@ -63,7 +61,7 @@ public class loginController {
         for (UserData u:userList) {
             if (usernameField.getText().equals(u.getUsername())) {
                 if (generateHash(passwordField.getText()).equals(u.getPassword())) {
-                    login(event, u);
+                    login(event, u, database);
                     loggedIn = true;
                     invalidPass = false;
                     break;
@@ -93,7 +91,7 @@ public class loginController {
         //todo.Implement a salt for further security
     }
 
-    public void login(ActionEvent event,UserData u){
+    public void login(ActionEvent event,UserData u,DatabaseConnection d){
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("mainScreen.fxml"));
@@ -101,7 +99,7 @@ public class loginController {
 
             Scene mainScreenScene = new Scene(mainScreenParent);
             mainController controller = loader.getController();
-            controller.intitData(u);
+            controller.intitData(u,d);
 
             //This line gets the stage info
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -113,5 +111,21 @@ public class loginController {
         }catch(IOException e){
             System.out.println("Error: "+e.getMessage()+e.getCause());
         }
+    }
+
+    public void initialize(){
+        database = new DatabaseConnection("SQL/SimplePlayer.db");
+
+
+        //TrackData Table Test
+        System.out.println("Tracks: ");
+        ArrayList<TrackData> trackList = new ArrayList<>();
+        TrackDataService.selectAll(trackList, database);
+        //returns the details of every song in the database
+        for (TrackData t:trackList){
+            System.out.println("Title: "+t.getTrackName()+", Length: "+t.getLength()+", Artist ID: "+t.getArtistID()+", Path: "+t.getPath());
+        }
+        System.out.println("");
+        //TEST CODE END
     }
 }

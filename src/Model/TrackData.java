@@ -5,12 +5,13 @@ public class TrackData {
     private String trackName;
     private int length;
     private int artistID;
+    private String path;
 
-
-    public TrackData(String trackName, int length, int artistID) {
+    public TrackData(String trackName, int length, int artistID,String path) {
         this.trackName = trackName;
         this.length = length;
         this.artistID = artistID;
+        this.path = path;
     }
 
     //Getters and Setters
@@ -26,5 +27,7 @@ public class TrackData {
     public int getArtistID() { return artistID; }
     public void setArtistID(int artistID) { this.artistID = artistID; }
 
+    public String getPath() { return path; }
 
+    public void setPath(String path) { this.path = path; }
 }

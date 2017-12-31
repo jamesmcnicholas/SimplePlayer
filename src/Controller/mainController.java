@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.XMPDM;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
@@ -37,9 +39,10 @@ public class mainController{
 
     private MediaPlayer player;
     private boolean paused;
-    private DatabaseConnection database = new DatabaseConnection("SQL/SimplePlayer.db");
+    private DatabaseConnection database;
     private UserData user;
     File cwd = new File("Songs/").getAbsoluteFile();
+    private ArrayList<TrackData> trackList = new ArrayList<>();
 
 
     @FXML private Label volumeLabel;
@@ -56,11 +59,11 @@ public class mainController{
         });
     }
 
-    public void intitData(UserData user) {
+    public void intitData(UserData user,DatabaseConnection d) {
         this.user = user;
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
 
-
+        database = d;
         volumeSlider.setMin(0);
         volumeSlider.setMax(100);
         volumeSlider.setValue(100);
@@ -100,10 +103,11 @@ public class mainController{
         List<File> filesToAdd = fileChooser.showOpenMultipleDialog(stage);
         if(filesToAdd != null){
             for(File f: filesToAdd){
-                System.out.println(f);
                 try {
                     copy(f,cwd);
-                    getMetadata(f);
+                    File copiedSong = FileUtils.getFile("Songs",f.getName());
+                    addSongToDatabase(getMetadata(copiedSong));
+                    System.out.println("Success!");
                 }catch (Exception e){
                     System.out.println(e.getMessage());
                 }
@@ -133,11 +137,6 @@ public class mainController{
         );
     }
 
-    private static void addFile(File file){
-        //TrackData newTrack = new TrackData();
-        //file.getName();
-        //todo.Find a way to get track metadata and push to db
-    }
 
     public static void copy(File source, File cwd) throws IOException {
         FileUtils.copyFileToDirectory(source,cwd);
@@ -156,7 +155,7 @@ public class mainController{
                 if(!paused) {
                     progressBar.setValue(newValue.toSeconds());
                 }
-                currentTimeLabel.setText(Long.toString(Math.round(newValue.toSeconds())));
+                currentTimeLabel.setText(formatTime((int)Math.round(newValue.toSeconds())));
             });
 
         } catch (Exception e) {
@@ -165,7 +164,7 @@ public class mainController{
 
         player.setOnReady(() -> {
             progressBar.setMax(player.getTotalDuration().toSeconds());
-            lengthLabel.setText(Long.toString(Math.round(player.getTotalDuration().toSeconds())));
+            lengthLabel.setText(formatTime((int)(Math.round(player.getTotalDuration().toSeconds()))));
             paused=true;
             //todo.implement scrubbing
         });
@@ -173,7 +172,7 @@ public class mainController{
     }
 
 
-    public void getMetadata(File file) throws Exception{
+    public TrackData getMetadata(File file) throws Exception{
         String fileLocation = file.getAbsolutePath();
         try {
 
@@ -184,31 +183,67 @@ public class mainController{
             ParseContext parseCtx = new ParseContext();
             parser.parse(input, handler, metadata, parseCtx);
             input.close();
-             /*
-             for(String name : metadataNames){
-                  System.out.println(name + ": " + metadata.get(name));
-             }
-             */
-            String[] metadataNames = metadata.names();
 
-                // Retrieve the necessary info from metadata
-                // Names - title, xmpDM:artist etc. - mentioned below may differ based
-            System.out.println("----------------------------------------------");
-            System.out.println("Title: " + metadata.get("title"));
-            System.out.println("Artists: " + metadata.get("xmpDM:artist"));
-            System.out.println("Composer : "+metadata.get("xmpDM:composer"));
-            System.out.println("Genre : "+metadata.get("xmpDM:genre"));
-            System.out.println("Album : "+metadata.get("xmpDM:album"));
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            //todo.implement method for fixing length & trackName
+
+            int artistID = getArtistID(metadata.get("xmpDM:artist"));
+            int duration = convertToSeconds(Double.parseDouble(metadata.get(XMPDM.DURATION)));
+            return new TrackData((metadata.get("xmpDM:title")),duration,artistID,("Songs/"+file.getName()));
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+            System.out.println(e.getMessage());
             } catch (SAXException e) {
-                e.printStackTrace();
+            System.out.println(e.getMessage());
             } catch (TikaException e) {
-                e.printStackTrace();
+            System.out.println(e.getMessage());
             }
+        return null;
+    }
+
+    public void addSongToDatabase(TrackData track){
+        TrackDataService.selectAll(trackList, database);
+        boolean trackExists = false;
+        for (TrackData t : trackList) {
+            if ((t.getPath().equals(track.getPath()))) {
+                trackExists=true;
+                break;
+            }
+        }
+        if(!trackExists) {
+            TrackDataService.save(track,database);
+            System.out.println("Track successfully added!");
+        }else{
+            System.out.println("Track is already in library");
+        }
+    }
+
+    public int getArtistID(String artist){
+        ArrayList<ArtistData> artistList = new ArrayList<>();
+        ArtistDataService.selectAll(artistList,database);
+        for(ArtistData a:artistList){
+            if(artist.equals(a.getArtistName())){
+                return a.getArtistID();
+            }
+        }
+        System.out.println("Artist not found");
+        return -1;
+        //todo.Add the artist here if they don't exist!
+    }
+
+    public int convertToSeconds(double milli){
+        return (int)(milli/1000);
+    }
+
+    public String formatTime(int time){
+        String formattedTime;
+        if((time%60)<10){ formattedTime=((time /60)+":0"+(time%60));
+
+        }else{ formattedTime=((time /60)+":"+(time%60)); }
+
+        return formattedTime;
     }
 }
 

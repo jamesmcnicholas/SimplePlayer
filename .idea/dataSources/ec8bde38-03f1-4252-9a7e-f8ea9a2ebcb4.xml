@@ -97,56 +97,60 @@
       <Position>3</Position>
       <DataType>STRING|0</DataType>
     </column>
-    <key id="32" parent="9">
+    <column id="32" parent="9" name="path">
+      <Position>4</Position>
+      <DataType>STRING|0</DataType>
+    </column>
+    <key id="33" parent="9">
       <ColNames>trackID</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="33" parent="9">
+    <foreign-key id="34" parent="9">
       <ColNames>artistID</ColNames>
       <RefTableName>ArtistData</RefTableName>
       <RefColNames>artistID</RefColNames>
     </foreign-key>
-    <column id="34" parent="10" name="userID">
+    <column id="35" parent="10" name="userID">
       <DataType>INTEGER|0</DataType>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="35" parent="10" name="username">
+    <column id="36" parent="10" name="username">
       <Position>1</Position>
       <DataType>STRING|0</DataType>
     </column>
-    <column id="36" parent="10" name="password">
+    <column id="37" parent="10" name="password">
       <Position>2</Position>
       <DataType>STRING|0</DataType>
     </column>
-    <column id="37" parent="10" name="accessLevel">
+    <column id="38" parent="10" name="accessLevel">
       <Position>3</Position>
       <DataType>INTEGER|0</DataType>
     </column>
-    <key id="38" parent="10">
+    <key id="39" parent="10">
       <ColNames>userID</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="39" parent="11" name="type">
+    <column id="40" parent="11" name="type">
       <DataType>text|0</DataType>
     </column>
-    <column id="40" parent="11" name="name">
+    <column id="41" parent="11" name="name">
       <Position>1</Position>
       <DataType>text|0</DataType>
     </column>
-    <column id="41" parent="11" name="tbl_name">
+    <column id="42" parent="11" name="tbl_name">
       <Position>2</Position>
       <DataType>text|0</DataType>
     </column>
-    <column id="42" parent="11" name="rootpage">
+    <column id="43" parent="11" name="rootpage">
       <Position>3</Position>
       <DataType>integer|0</DataType>
     </column>
-    <column id="43" parent="11" name="sql">
+    <column id="44" parent="11" name="sql">
       <Position>4</Position>
       <DataType>text|0</DataType>
     </column>
-    <column id="44" parent="12" name="name"/>
-    <column id="45" parent="12" name="seq">
+    <column id="45" parent="12" name="name"/>
+    <column id="46" parent="12" name="seq">
       <Position>1</Position>
     </column>
   </database-model>

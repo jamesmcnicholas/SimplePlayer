@@ -9,7 +9,7 @@ import static Model.DatabaseConnection.deleteFromTable;
 
 public class TrackDataService {
     public static void selectAll(List<TrackData> targetList, DatabaseConnection database){
-        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID FROM TrackData ORDER BY trackID");
+        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID, path FROM TrackData ORDER BY trackID");
         try{
             if(statement != null){
                 ResultSet results = database.executeQuery(statement);
@@ -19,7 +19,8 @@ public class TrackDataService {
                         targetList.add(new TrackData(
                                 results.getString("trackName"),
                                 results.getInt("length"),
-                                results.getInt("artistID")
+                                results.getInt("artistID"),
+                                results.getString("path")
                         ));
                     }
                 }
@@ -32,7 +33,7 @@ public class TrackDataService {
 
     public static TrackData selectByID(int id, DatabaseConnection database){
         TrackData result = null;
-        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID FROM TrackData WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID, path FROM TrackData WHERE id = ?");
 
         try {
             if (statement != null) {
@@ -44,7 +45,8 @@ public class TrackDataService {
                     result = new TrackData(
                             results.getString("trackName"),
                             results.getInt("length"),
-                            results.getInt("artistID"));
+                            results.getInt("artistID"),
+                            results.getString("path"));
                 }
             }
         } catch (SQLException resultsException) {
@@ -58,19 +60,19 @@ public class TrackDataService {
 
         try {
             if (existingItem == null) {
-                PreparedStatement statement = database.newStatement("INSERT INTO TrackData (trackID, trackName, length, artistID) VALUES (?, ?, ?, ?)");
-                statement.setInt(1, itemToSave.getTrackID());
-                statement.setString(2, itemToSave.getTrackName());
-                statement.setInt(3,itemToSave.getLength());
-                statement.setInt(4,itemToSave.getArtistID());
+                PreparedStatement statement = database.newStatement("INSERT INTO TrackData (trackName, length, artistID, path) VALUES (?, ?, ?, ?)");
+                statement.setString(1, itemToSave.getTrackName());
+                statement.setInt(2,itemToSave.getLength());
+                statement.setInt(3,itemToSave.getArtistID());
+                statement.setString(4,itemToSave.getPath());
                 database.executeUpdate(statement);
             }
             else {
-                PreparedStatement statement = database.newStatement("UPDATE TrackData SET trackID, trackName, length, artistID = ?, WHERE trackID = ?");
-                statement.setInt(1, itemToSave.getTrackID());
-                statement.setString(2, itemToSave.getTrackName());
-                statement.setInt(3,itemToSave.getLength());
-                statement.setInt(4,itemToSave.getArtistID());
+                PreparedStatement statement = database.newStatement("UPDATE TrackData SET trackName, length, artistID, path = ?, WHERE trackID = ?");
+                statement.setString(1, itemToSave.getTrackName());
+                statement.setInt(2,itemToSave.getLength());
+                statement.setInt(3,itemToSave.getArtistID());
+                statement.setString(4,itemToSave.getPath());
                 database.executeUpdate(statement);
             }
         } catch (SQLException resultsException) {
