@@ -18,8 +18,8 @@ public class ArtistDataService {
                 if(results!=null){
                     while(results.next()){
                         targetList.add(new ArtistData(
-                                results.getString("artistName"),
-                                results.getInt("artistID")
+                                results.getInt("artistID"),
+                                results.getString("artistName")
                         ));
                     }
                 }
@@ -30,7 +30,7 @@ public class ArtistDataService {
     }
     public static ArtistData selectByID(int id, DatabaseConnection database){
         ArtistData result = null;
-        PreparedStatement statement = database.newStatement("SELECT artistID, artistName FROM ArtistData WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT artistID, artistName FROM ArtistData WHERE ArtistID = ?");
 
         try {
             if (statement != null) {
@@ -40,8 +40,8 @@ public class ArtistDataService {
 
                 if (results != null) {
                     result = new ArtistData(
-                            results.getString("artistName"),
-                            results.getInt("artistID"));
+                            results.getInt("artistID"),
+                            results.getString("artistName"));
 
                 }
             }
@@ -64,7 +64,7 @@ public class ArtistDataService {
             }
             else {
                 PreparedStatement statement = database.newStatement("UPDATE ArtistData SET artistID, artistName = ?, WHERE artistID = ?");
-                statement.setString(2, itemToSave.getArtistName());
+                statement.setString(1, itemToSave.getArtistName());
                 database.executeUpdate(statement);
             }
         } catch (SQLException resultsException) {

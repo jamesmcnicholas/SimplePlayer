@@ -2,10 +2,14 @@ package Controller;
 
 import Model.*;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.media.Media;
 
 import javafx.stage.FileChooser;
@@ -17,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +49,10 @@ public class mainController{
     File cwd = new File("Songs/").getAbsoluteFile();
     private ArrayList<TrackData> trackList = new ArrayList<>();
 
+    @FXML private TableView<SongView> tableView;
+    @FXML private TableColumn<SongView,SimpleStringProperty> NameColumn;
+    @FXML private TableColumn<SongView,SimpleStringProperty> ArtistColumn;
+    @FXML private TableColumn<SongView,SimpleStringProperty> LengthColumn;
 
     @FXML private Label volumeLabel;
     @FXML private Label nameDisplayLabel;
@@ -52,6 +61,7 @@ public class mainController{
     @FXML private Label currentSongText;
     @FXML private Label currentTimeLabel;
     @FXML private Label lengthLabel;
+
     @FXML protected void progressDragDropped(ActionEvent event) {
         System.out.println(event.toString());
         progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -74,6 +84,15 @@ public class mainController{
         });
 
         progressBar.setMin(0);
+
+        //Sets up columns
+        NameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        ArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Artist"));
+        LengthColumn.setCellValueFactory(new PropertyValueFactory<>("Length"));
+
+        //Load dummy data
+        tableView.setItems(updateTable());
+
     }
 
     @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
@@ -109,9 +128,11 @@ public class mainController{
                     addSongToDatabase(getMetadata(copiedSong));
                     System.out.println("Success!");
                 }catch (Exception e){
+                    System.out.println("Adding failed");
                     System.out.println(e.getMessage());
                 }
             }
+            tableView.setItems(updateTable());
             loadIntoPlayer(filesToAdd.get(0));
         }
     }
@@ -185,11 +206,11 @@ public class mainController{
             input.close();
 
 
-            //todo.implement method for fixing length & trackName
-
+            //todo.implement method for fixing trackName
             int artistID = getArtistID(metadata.get("xmpDM:artist"));
             int duration = convertToSeconds(Double.parseDouble(metadata.get(XMPDM.DURATION)));
-            return new TrackData((metadata.get("xmpDM:title")),duration,artistID,("Songs/"+file.getName()));
+            System.out.println("TITLE: "+metadata.get("title"));
+            return new TrackData((metadata.get("title")),duration,artistID,("Songs/"+file.getName()));
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -220,18 +241,21 @@ public class mainController{
         }
     }
 
-    public int getArtistID(String artist){
-        ArrayList<ArtistData> artistList = new ArrayList<>();
-        ArtistDataService.selectAll(artistList,database);
-        for(ArtistData a:artistList){
-            if(artist.equals(a.getArtistName())){
-                return a.getArtistID();
+    public int getArtistID(String artist) {
+        if (artist != null) {
+            ArrayList<ArtistData> artistList = new ArrayList<>();
+            ArtistDataService.selectAll(artistList, database);
+            for (ArtistData a : artistList) {
+                if (artist.equals(a.getArtistName())) {
+                    return a.getArtistID();
+                }
             }
+            ArtistData newArtist = new ArtistData((artist));
+            ArtistDataService.save(newArtist, database);
+            System.out.println("Artist not found, adding to database");
+            return getArtistID(artist);
         }
-        ArtistData newArtist = new ArtistData((artist));
-        ArtistDataService.save(newArtist,database);
-        System.out.println("Artist not found, adding to database");
-        return getArtistID(artist);
+        return 0;
     }
 
     public int convertToSeconds(double milli){
@@ -245,6 +269,19 @@ public class mainController{
         }else{ formattedTime=((time /60)+":"+(time%60)); }
 
         return formattedTime;
+    }
+
+    public ObservableList<SongView> updateTable(){
+        ObservableList<SongView> songsToAdd = FXCollections.observableArrayList();
+
+        TrackDataService.selectAll(trackList, database);
+
+        for(TrackData t:trackList){
+            String artist = ArtistDataService.selectByID(t.getArtistID(),database).getArtistName();
+            SongView newRow = new SongView(t.getTrackName(),artist,formatTime(t.getLength()));
+            songsToAdd.add(newRow);
+        }
+        return songsToAdd;
     }
 }
 

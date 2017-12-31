@@ -4,7 +4,7 @@ public class ArtistData {
     private int artistID;
     private String artistName;
 
-    public ArtistData(String artistName,int artistID) {
+    public ArtistData(int artistID, String artistName) {
         this.artistID = artistID;
         this.artistName = artistName;
     }
