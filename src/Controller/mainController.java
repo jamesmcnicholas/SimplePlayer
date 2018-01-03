@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,10 +43,13 @@ public class mainController{
 
     private MediaPlayer player;
     private boolean paused;
+    private boolean playerInitialised;
     private DatabaseConnection database;
     private UserData user;
     File cwd = new File("Songs/").getAbsoluteFile();
     private ArrayList<TrackData> trackList = new ArrayList<>();
+    private ArrayList<TrackData> queue = new ArrayList<>();
+    ObservableList<SongView> songsToAdd = FXCollections.observableArrayList();
 
     @FXML private TableView<SongView> tableView;
     @FXML private TableColumn<SongView,SimpleStringProperty> NameColumn;
@@ -69,7 +71,7 @@ public class mainController{
         });
     }
 
-    public void intitData(UserData user,DatabaseConnection d) {
+    public void initData(UserData user,DatabaseConnection d) {
         this.user = user;
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
 
@@ -127,27 +129,23 @@ public class mainController{
                     File copiedSong = FileUtils.getFile("Songs",f.getName());
                     addSongToDatabase(getMetadata(copiedSong));
                     System.out.println("Success!");
+                    addToTable(getMetadata(f));
+                    tableView.refresh();
                 }catch (Exception e){
                     System.out.println("Adding failed");
                     System.out.println(e.getMessage());
                 }
             }
-            tableView.setItems(updateTable());
+
+
             loadIntoPlayer(filesToAdd.get(0));
+            playerInitialised = true;
         }
     }
-
 
     @FXML protected void removeSongButtonPressed(ActionEvent event){ System.out.println("song remove pressed"); }
     @FXML protected void playNextButtonPressed(ActionEvent event){ System.out.println("song will play next"); }
     @FXML protected void addToPlaylistButtonPressed(ActionEvent event){ System.out.println("added to playlist"); }
-
-    public void initialize(){
-        /*
-            todo.Populate table with user's library
-         */
-        //ArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Hello there"));
-    }
 
     private static void configureFileChooser(final FileChooser fileChooser) {
         fileChooser.setTitle("View Music");
@@ -158,17 +156,18 @@ public class mainController{
         );
     }
 
-
-    public static void copy(File source, File cwd) throws IOException {
+    private static void copy(File source, File cwd) throws IOException {
         FileUtils.copyFileToDirectory(source,cwd);
     }
 
-    public void loadIntoPlayer(File f){
-        /**
-         * This should be moved to a play method
-         */
-        currentSongText.setText("Now playing - " + f.getName());
+    private void loadIntoPlayer(File f){
+        if(playerInitialised){
+            player.stop();
+        }
+
         try {
+            TrackData playing = getMetadata(f);
+            currentSongText.setText("Now Playing: "+ArtistDataService.selectByID(playing.getArtistID(),database).getArtistName()+" - "+playing.getTrackName());
             Media pick = new Media(f.toURI().toURL().toString());
             player = new MediaPlayer(pick);
 
@@ -192,8 +191,7 @@ public class mainController{
 
     }
 
-
-    public TrackData getMetadata(File file) throws Exception{
+    private TrackData getMetadata(File file) throws Exception{
         String fileLocation = file.getAbsolutePath();
         try {
 
@@ -224,7 +222,7 @@ public class mainController{
         return null;
     }
 
-    public void addSongToDatabase(TrackData track){
+    private void addSongToDatabase(TrackData track){
         TrackDataService.selectAll(trackList, database);
         boolean trackExists = false;
         for (TrackData t : trackList) {
@@ -241,7 +239,7 @@ public class mainController{
         }
     }
 
-    public int getArtistID(String artist) {
+    private int getArtistID(String artist) {
         if (artist != null) {
             ArrayList<ArtistData> artistList = new ArrayList<>();
             ArtistDataService.selectAll(artistList, database);
@@ -258,11 +256,11 @@ public class mainController{
         return 0;
     }
 
-    public int convertToSeconds(double milli){
+    private int convertToSeconds(double milli){
         return (int)(milli/1000);
     }
 
-    public String formatTime(int time){
+    private String formatTime(int time){
         String formattedTime;
         if((time%60)<10){ formattedTime=((time /60)+":0"+(time%60));
 
@@ -271,18 +269,26 @@ public class mainController{
         return formattedTime;
     }
 
-    public ObservableList<SongView> updateTable(){
-        ObservableList<SongView> songsToAdd = FXCollections.observableArrayList();
-
+    private ObservableList<SongView> updateTable(){
         TrackDataService.selectAll(trackList, database);
 
         for(TrackData t:trackList){
-            String artist = ArtistDataService.selectByID(t.getArtistID(),database).getArtistName();
+            String artist = getArtistName(t.getArtistID());
             SongView newRow = new SongView(t.getTrackName(),artist,formatTime(t.getLength()));
             songsToAdd.add(newRow);
         }
         return songsToAdd;
     }
+
+    private ObservableList<SongView> addToTable(TrackData track){
+        songsToAdd.add(new SongView(track.getTrackName(),getArtistName(track.getArtistID()),formatTime(track.getLength())));
+        return songsToAdd;
+    }
+
+    private String getArtistName(int id){
+        return ArtistDataService.selectByID(id,database).getArtistName();
+    }
+
 }
 
 

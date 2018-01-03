@@ -99,7 +99,7 @@ public class loginController {
 
             Scene mainScreenScene = new Scene(mainScreenParent);
             mainController controller = loader.getController();
-            controller.intitData(u,d);
+            controller.initData(u,d);
 
             //This line gets the stage info
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
