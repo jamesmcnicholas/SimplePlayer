@@ -109,7 +109,8 @@ public class mainController{
         });
 
     }
-
+    @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
+    @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
     @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
 
@@ -357,9 +358,16 @@ public class mainController{
 
     private void playNext(){
         if(!loop&&!shuffle){
+            //If not looping or shuffling, get the next song and play it
             int id = tableView.getSelectionModel().getSelectedIndex();
             tableView.getSelectionModel().select(id+1);
             SongView rowData = tableView.getItems().get(id+1);
+            playRow(rowData);
+        }
+        else if(loop){
+            //If loop enabled, reselect the current row and play again
+            int id = tableView.getSelectionModel().getSelectedIndex();
+            SongView rowData = tableView.getItems().get(id);
             playRow(rowData);
         }
     }
