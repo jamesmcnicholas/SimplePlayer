@@ -93,17 +93,21 @@ public class loginController {
 
     public void login(ActionEvent event,UserData u,DatabaseConnection d){
         try {
+            //Creates a new FXMLLoader object and loads in the main controller
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("mainScreen.fxml"));
             Parent mainScreenParent = loader.load();
 
+            //Sets up the scene with the elements from the FXML file
             Scene mainScreenScene = new Scene(mainScreenParent);
+            //Runs the initial setup for the main screen
             mainController controller = loader.getController();
             controller.initData(u,d);
 
-            //This line gets the stage info
+            //Gets the stage info
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
+            //Assigns details to the new scene (Icon, title) then shows the window.
             window.setScene(mainScreenScene);
             window.getIcons().add(new Image("sp-logo.png"));
             window.setTitle("SimplePlayer Library");

@@ -71,11 +71,6 @@ public class mainController{
     @FXML private Label currentTimeLabel;
     @FXML private Label lengthLabel;
 
-    @FXML protected void progressDragDropped(ActionEvent event) {
-        System.out.println(event.toString());
-        progressBar.valueProperty().addListener((observable, oldValue, newValue) -> player.seek(Duration.seconds(newValue.intValue())));
-    }
-
     public void initData(UserData user,DatabaseConnection d) {
         this.user = user;
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
@@ -211,6 +206,12 @@ public class mainController{
                     progressBar.setValue(newValue.toSeconds());
                 }
                 currentTimeLabel.setText(formatTime((int)Math.round(newValue.toSeconds())));
+            });
+
+            progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
+                if((((oldValue.intValue()+1)<(newValue.intValue()) || ((oldValue.intValue()-1)>(newValue.intValue()))))){
+                    player.seek(Duration.seconds(newValue.intValue()));
+                }
             });
 
             playerInitialised = true;
@@ -371,8 +372,8 @@ public class mainController{
     }
 
     private void playRow(SongView rowData){
-        playURL();
-        //loadIntoPlayer(new File(getPath(rowData.getName())));
+        //playURL();
+        loadIntoPlayer(new File(getPath(rowData.getName())));
         player.play();
         paused = false;
     }
@@ -384,6 +385,7 @@ public class mainController{
             playLast();
         }
     }
+    /*
     private void playURL(){
         File loadMeDad = new File("Controller/LoginScreen.fxml");
         try {
@@ -395,5 +397,6 @@ public class mainController{
             System.out.println(e.getMessage());
         }
     }
+    */
 
 }

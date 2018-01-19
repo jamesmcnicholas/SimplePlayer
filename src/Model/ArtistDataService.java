@@ -1,22 +1,25 @@
 package Model;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import java.sql.PreparedStatement; //Statements for SQLite
+import java.sql.ResultSet; //Holds results from queries
+import java.sql.SQLException; //Handles SQL based exceptions
+import java.util.List; //Holds parsed in data
 
 import static Model.DatabaseConnection.deleteFromTable;
 
 public class ArtistDataService {
-
+    //Method for selecting all items in the table
     public static void selectAll(List<ArtistData> targetList,DatabaseConnection database){
+        //Builds a statement ready for execution
         PreparedStatement statement = database.newStatement("SELECT artistID, artistName FROM ArtistData ORDER BY artistID");
         try{
             if(statement != null){
+                //Executes the statement if it exists
                 ResultSet results = database.executeQuery(statement);
 
                 if(results!=null){
                     while(results.next()){
+                        //While there are more results, add these results to the specified list
                         targetList.add(new ArtistData(
                                 results.getInt("artistID"),
                                 results.getString("artistName")
