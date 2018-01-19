@@ -115,17 +115,5 @@ public class loginController {
 
     public void initialize(){
         database = new DatabaseConnection("SQL/SimplePlayer.db");
-
-
-        //TrackData Table Test
-        System.out.println("Tracks: ");
-        ArrayList<TrackData> trackList = new ArrayList<>();
-        TrackDataService.selectAll(trackList, database);
-        //returns the details of every song in the database
-        for (TrackData t:trackList){
-            System.out.println("Title: "+t.getTrackName()+", Length: "+t.getLength()+", Artist ID: "+t.getArtistID()+", Path: "+t.getPath());
-        }
-        System.out.println("");
-        //TEST CODE END
     }
 }

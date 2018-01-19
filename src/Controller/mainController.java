@@ -12,7 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.media.Media;
 
-import javafx.scene.media.Track;
+
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class mainController{
 
     private MediaPlayer player;
-    private boolean paused;
+    private boolean paused=false;
     private boolean playerInitialised;
     private DatabaseConnection database;
     private UserData user;
@@ -53,6 +54,9 @@ public class mainController{
     private ArrayList<TrackData> queue = new ArrayList<>();
     private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
     private TrackData currentSong;
+    private double currentVolume = 100;
+    private boolean loop;
+    private boolean shuffle;
 
     @FXML private TableView<SongView> tableView;
     @FXML private TableColumn<SongView,SimpleStringProperty> NameColumn;
@@ -69,14 +73,13 @@ public class mainController{
 
     @FXML protected void progressDragDropped(ActionEvent event) {
         System.out.println(event.toString());
-        progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
-            player.seek(Duration.seconds(newValue.intValue()));
-        });
+        progressBar.valueProperty().addListener((observable, oldValue, newValue) -> player.seek(Duration.seconds(newValue.intValue())));
     }
 
     public void initData(UserData user,DatabaseConnection d) {
         this.user = user;
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
+        paused = false;
 
         database = d;
         volumeSlider.setMin(0);
@@ -86,6 +89,7 @@ public class mainController{
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             volumeLabel.setText("VOLUME: " + newValue.intValue() + "%");
             player.setVolume(newValue.doubleValue() / 100);
+            currentVolume = (newValue.doubleValue() / 100);
         });
 
         progressBar.setMin(0);
@@ -98,27 +102,37 @@ public class mainController{
         //Load dummy data
         tableView.setItems(initialiseTable());
 
+        tableView.setRowFactory( tv -> {
+            TableRow<SongView> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    SongView rowData = row.getItem();
+                    playRow(rowData);
+                }
+            });
+            return row ;
+        });
+
     }
 
-    @FXML protected void nextButtonPressed(ActionEvent event){ System.out.println("skip pressed"); }
-    @FXML protected void prevButtonPressed(ActionEvent event){ System.out.println("prev pressed"); }
+    @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
+    @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
 
-    @FXML protected void pauseButtonPressed(ActionEvent event) {
+    @FXML protected void pauseButtonPressed() {
         try {
-
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
-                if (paused) {
-                    player.play();
-                    System.out.println("Playing");
-                    paused = false;
-                } else {
+                if (!paused) {
                     player.pause();
                     System.out.println("Paused");
                     paused = true;
+
+                } else {
+                    player.play();
+                    System.out.println("Playing");
+                    paused = false;
                 }
             } else {
-                File f = new File(getPath(getSelectedRow().getName()));
-                loadIntoPlayer(f);
+                playRow(getSelectedRow());
             }
         }catch (NullPointerException n){
             System.out.println(n.getMessage());
@@ -190,6 +204,7 @@ public class mainController{
             Media pick = new Media(f.toURI().toURL().toString());
             player = new MediaPlayer(pick);
             currentSong = playing;
+            player.setVolume(currentVolume);
 
             player.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                 if(!paused) {
@@ -206,7 +221,6 @@ public class mainController{
         player.setOnReady(() -> {
             progressBar.setMax(player.getTotalDuration().toSeconds());
             lengthLabel.setText(formatTime((int)(Math.round(player.getTotalDuration().toSeconds()))));
-            paused=true;
             //todo.implement scrubbing
         });
 
@@ -329,9 +343,57 @@ public class mainController{
         }
         return null;
     }
+    private String getPath(int id){
+        ArrayList<TrackData> tracks = new ArrayList<>();
+        TrackDataService.selectAll(tracks,database);
+        for(TrackData t:tracks){
+            if (t.getTrackID()==id){
+                return t.getPath();
+            }
+        }
+        return null;
+    }
+
+    private void playNext(){
+        if(!loop&&!shuffle){
+            int id = tableView.getSelectionModel().getSelectedIndex();
+            tableView.getSelectionModel().select(id+1);
+            SongView rowData = tableView.getItems().get(id+1);
+            playRow(rowData);
+        }
+    }
+
+    private void playLast(){
+            int id = tableView.getSelectionModel().getSelectedIndex();
+            SongView rowData = tableView.getItems().get(id-1);
+            playRow(rowData);
+            tableView.getSelectionModel().select(rowData);
+    }
+
+    private void playRow(SongView rowData){
+        playURL();
+        //loadIntoPlayer(new File(getPath(rowData.getName())));
+        player.play();
+        paused = false;
+    }
+
+    private void handlePlayLast(){
+        if(player.getCurrentTime().toSeconds()>3){
+            player.seek(Duration.seconds(0));
+        }else{
+            playLast();
+        }
+    }
+    private void playURL(){
+        File loadMeDad = new File("Controller/LoginScreen.fxml");
+        try {
+            URL url = new URL("http://www.ntonyx.com/mp3files/Morning_Flower.mp3");
+
+            FileUtils.copyURLToFile(url, loadMeDad);
+            loadIntoPlayer(loadMeDad);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 }
-
-
-
-
-
