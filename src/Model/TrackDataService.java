@@ -8,6 +8,7 @@ import java.util.List;
 import static Model.DatabaseConnection.deleteFromTable;
 
 public class TrackDataService {
+
     public static void selectAll(List<TrackData> targetList, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID, path FROM TrackData ORDER BY trackID");
         try{
@@ -17,6 +18,7 @@ public class TrackDataService {
                 if(results!=null){
                     while(results.next()){
                         targetList.add(new TrackData(
+                                results.getInt("trackID"),
                                 results.getString("trackName"),
                                 results.getInt("length"),
                                 results.getInt("artistID"),
@@ -43,6 +45,7 @@ public class TrackDataService {
 
                 if (results != null) {
                     result = new TrackData(
+                            results.getInt("trackID"),
                             results.getString("trackName"),
                             results.getInt("length"),
                             results.getInt("artistID"),
@@ -54,9 +57,13 @@ public class TrackDataService {
         }
         return result;
     }
+
+
     public static void save(TrackData itemToSave, DatabaseConnection database){
         TrackData existingItem = null;
-        if (itemToSave.getTrackID() != 0) existingItem = selectByID(itemToSave.getTrackID(), database);
+        if (itemToSave.getTrackID() != 0){
+            existingItem = selectByID(itemToSave.getTrackID(), database);
+        }
 
         try {
             if (existingItem == null) {
@@ -85,4 +92,5 @@ public class TrackDataService {
         PreparedStatement statement = database.newStatement("DELETE FROM TrackData WHERE trackID = ?");
         deleteFromTable(id,database,statement);
     }
+
 }

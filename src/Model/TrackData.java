@@ -7,6 +7,14 @@ public class TrackData {
     private int artistID;
     private String path;
 
+    public TrackData(int trackID, String trackName, int length, int artistID,String path) {
+        this.trackName = trackName;
+        this.length = length;
+        this.artistID = artistID;
+        this.path = path;
+        this.trackID=trackID;
+    }
+
     public TrackData(String trackName, int length, int artistID,String path) {
         this.trackName = trackName;
         this.length = length;

@@ -13,6 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.media.Media;
 
 
+import javafx.scene.media.Track;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -22,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,25 +44,31 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class mainController{
 
+    //Variable declarations relating to the media player
     private MediaPlayer player;
     private boolean paused=false;
     private boolean playerInitialised;
-    private DatabaseConnection database;
-    private UserData user;
-    File cwd = new File("Songs/").getAbsoluteFile();
-    private ArrayList<TrackData> trackList = new ArrayList<>();
-    private ArrayList<TrackData> queue = new ArrayList<>();
-    private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
-    private TrackData currentSong;
-    private double currentVolume = 100;
     private boolean loop;
     private boolean shuffle;
+    private TrackData currentSong;
+    private ArrayList<TrackData> trackList = new ArrayList<>();
+    private double currentVolume = 100;
+    private ArrayList<SongView> queue = new ArrayList<>();
 
+    //Other declarations
+    private DatabaseConnection database;
+    private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
+    private UserData user;
+    File cwd = new File("Songs/").getAbsoluteFile();
+
+
+    //FXML TableView declarations
     @FXML private TableView<SongView> tableView;
     @FXML private TableColumn<SongView,SimpleStringProperty> NameColumn;
     @FXML private TableColumn<SongView,SimpleStringProperty> ArtistColumn;
     @FXML private TableColumn<SongView,SimpleStringProperty> LengthColumn;
 
+    //Other FXML Declarations
     @FXML private Label volumeLabel;
     @FXML private Label nameDisplayLabel;
     @FXML private Slider progressBar;
@@ -71,6 +77,7 @@ public class mainController{
     @FXML private Label currentTimeLabel;
     @FXML private Label lengthLabel;
 
+    //Method for initialising the database and other items
     public void initData(UserData user,DatabaseConnection d) {
         this.user = user;
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
@@ -109,11 +116,13 @@ public class mainController{
         });
 
     }
+
+
+    //Methods for button handling
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
     @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
-
     @FXML protected void pauseButtonPressed() {
         try {
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
@@ -134,9 +143,7 @@ public class mainController{
             System.out.println(n.getMessage());
         }
     }
-
     @FXML protected void queueButtonPressed(ActionEvent event){ }
-
     @FXML protected void addSongButtonPressed(ActionEvent event) {
         //Opens file explorer and gets PATH to music
         Stage stage = new Stage();
@@ -161,14 +168,23 @@ public class mainController{
             }
         }
     }
-
     @FXML protected void removeSongButtonPressed(ActionEvent event){
-        if(getSelectedRow()!=null){
-            //removes song from table, but not library or db
-            tableSongs.remove(getSelectedRow());
-            tableView.refresh();
+        SongView row = getSelectedRow();
+        if(row!=null){
+            TrackData track = getTrackFromName(row.getName());
+            System.out.println(track.getTrackName());
 
-            //todo.Implement methods for removing songs from both database and source folder
+
+            System.out.println(track.getTrackID());
+            TrackDataService.deleteByID(track.getTrackID(),database);
+
+            tableSongs.remove(row);
+
+            try {
+                FileUtils.forceDelete(FileUtils.getFile(track.getPath()));
+            }catch (IOException i){
+                System.out.println(i.getMessage());
+            }
         }else{
             System.out.println("Select a song first");
         }
@@ -176,6 +192,97 @@ public class mainController{
     @FXML protected void playNextButtonPressed(ActionEvent event){ System.out.println("song will play next"); }
     @FXML protected void addToPlaylistButtonPressed(ActionEvent event){ System.out.println("added to playlist"); }
 
+
+    //Getters for database items
+    private String getArtistName(int id){
+        return ArtistDataService.selectByID(id,database).getArtistName();
+    }
+    private void addSongToDatabase(TrackData track){
+        TrackDataService.selectAll(trackList, database);
+        boolean trackExists = false;
+        for (TrackData t : trackList) {
+            if ((t.getPath().equals(track.getPath()))) {
+                trackExists=true;
+                break;
+            }
+        }
+        if(!trackExists) {
+            TrackDataService.save(track,database);
+            System.out.println("Track successfully added!");
+        }else{
+            System.out.println("Track is already in library");
+        }
+    }
+    private int getArtistID(String artist) {
+        if (artist != null) {
+            ArrayList<ArtistData> artistList = new ArrayList<>();
+            ArtistDataService.selectAll(artistList, database);
+            for (ArtistData a : artistList) {
+                if (artist.equals(a.getArtistName())) {
+                    return a.getArtistID();
+                }
+            }
+            ArtistData newArtist = new ArtistData((artist));
+            ArtistDataService.save(newArtist, database);
+            System.out.println("Artist not found, adding to database");
+            return getArtistID(artist);
+        }
+        return 0;
+    }
+    @Nullable
+    private TrackData getMetadata(File file) throws Exception{
+        String fileLocation = file.getAbsolutePath();
+        try {
+
+            InputStream input = new FileInputStream(new File(fileLocation));
+            ContentHandler handler = new DefaultHandler();
+            Metadata metadata = new Metadata();
+            Parser parser = new Mp3Parser();
+            ParseContext parseCtx = new ParseContext();
+            parser.parse(input, handler, metadata, parseCtx);
+            input.close();
+
+            int artistID = getArtistID(metadata.get("xmpDM:artist"));
+            int duration = convertToSeconds(Double.parseDouble(metadata.get(XMPDM.DURATION)));
+            return new TrackData((metadata.get("title")),duration,artistID,("Songs/"+file.getName()));
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (SAXException e) {
+            System.out.println(e.getMessage());
+        } catch (TikaException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+    @Nullable
+    private String getPath(String name){
+        ArrayList<TrackData> tracks = new ArrayList<>();
+        TrackDataService.selectAll(tracks,database);
+        for(TrackData t:tracks){
+            if (t.getTrackName().equals(name)){
+                return t.getPath();
+            }
+        }
+        return null;
+    }
+    private TrackData getTrackFromName(String trackName) {
+        if (trackName != null) {
+            ArrayList<TrackData> trackList = new ArrayList<>();
+            TrackDataService.selectAll(trackList, database);
+            for (TrackData t : trackList) {
+                if (trackName.equals(t.getTrackName())) {
+                    System.out.println("Track id: "+t.getTrackID());
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
+
+    //File handling methods
     private static void configureFileChooser(final FileChooser fileChooser) {
         fileChooser.setTitle("View Music");
         fileChooser.getExtensionFilters().addAll(
@@ -184,11 +291,9 @@ public class mainController{
                 new FileChooser.ExtensionFilter("WAV", "*.wav")
         );
     }
-
     private static void copy(File source, File cwd) throws IOException {
         FileUtils.copyFileToDirectory(source,cwd);
     }
-
     private void loadIntoPlayer(File f){
         if(playerInitialised){
             player.stop();
@@ -228,73 +333,10 @@ public class mainController{
 
     }
 
-    @Nullable
-    private TrackData getMetadata(File file) throws Exception{
-        String fileLocation = file.getAbsolutePath();
-        try {
-
-            InputStream input = new FileInputStream(new File(fileLocation));
-            ContentHandler handler = new DefaultHandler();
-            Metadata metadata = new Metadata();
-            Parser parser = new Mp3Parser();
-            ParseContext parseCtx = new ParseContext();
-            parser.parse(input, handler, metadata, parseCtx);
-            input.close();
-
-            int artistID = getArtistID(metadata.get("xmpDM:artist"));
-            int duration = convertToSeconds(Double.parseDouble(metadata.get(XMPDM.DURATION)));
-            return new TrackData((metadata.get("title")),duration,artistID,("Songs/"+file.getName()));
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-            } catch (IOException e) {
-            System.out.println(e.getMessage());
-            } catch (SAXException e) {
-            System.out.println(e.getMessage());
-            } catch (TikaException e) {
-            System.out.println(e.getMessage());
-            }
-        return null;
-    }
-
-    private void addSongToDatabase(TrackData track){
-        TrackDataService.selectAll(trackList, database);
-        boolean trackExists = false;
-        for (TrackData t : trackList) {
-            if ((t.getPath().equals(track.getPath()))) {
-                trackExists=true;
-                break;
-            }
-        }
-        if(!trackExists) {
-            TrackDataService.save(track,database);
-            System.out.println("Track successfully added!");
-        }else{
-            System.out.println("Track is already in library");
-        }
-    }
-
-    private int getArtistID(String artist) {
-        if (artist != null) {
-            ArrayList<ArtistData> artistList = new ArrayList<>();
-            ArtistDataService.selectAll(artistList, database);
-            for (ArtistData a : artistList) {
-                if (artist.equals(a.getArtistName())) {
-                    return a.getArtistID();
-                }
-            }
-            ArtistData newArtist = new ArtistData((artist));
-            ArtistDataService.save(newArtist, database);
-            System.out.println("Artist not found, adding to database");
-            return getArtistID(artist);
-        }
-        return 0;
-    }
-
+    //Time formatting methods
     private int convertToSeconds(double milli){
         return (int)(milli/1000);
     }
-
     private String formatTime(int time){
         String formattedTime;
         if((time%60)<10){ formattedTime=((time /60)+":0"+(time%60));
@@ -304,7 +346,7 @@ public class mainController{
         return formattedTime;
     }
 
-//rename this to "initialiseTable"
+    //TableView methods
     private ObservableList<SongView> initialiseTable(){
         TrackDataService.selectAll(trackList, database);
 
@@ -315,16 +357,10 @@ public class mainController{
         }
         return tableSongs;
     }
-
     private ObservableList<SongView> addToTable(TrackData track){
         tableSongs.add(new SongView(track.getTrackName(),getArtistName(track.getArtistID()),formatTime(track.getLength())));
         return tableSongs;
     }
-
-    private String getArtistName(int id){
-        return ArtistDataService.selectByID(id,database).getArtistName();
-    }
-
     @Nullable
     private SongView getSelectedRow(){
         if(tableView.getSelectionModel().getSelectedItem()!=null) {
@@ -334,28 +370,12 @@ public class mainController{
             return null;
         }
     }
-
-    private String getPath(String name){
-        ArrayList<TrackData> tracks = new ArrayList<>();
-        TrackDataService.selectAll(tracks,database);
-        for(TrackData t:tracks){
-            if (t.getTrackName().equals(name)){
-                return t.getPath();
-            }
-        }
-        return null;
+    private void playRow(SongView rowData){
+        //playURL();
+        loadIntoPlayer(new File(getPath(rowData.getName())));
+        player.play();
+        paused = false;
     }
-    private String getPath(int id){
-        ArrayList<TrackData> tracks = new ArrayList<>();
-        TrackDataService.selectAll(tracks,database);
-        for(TrackData t:tracks){
-            if (t.getTrackID()==id){
-                return t.getPath();
-            }
-        }
-        return null;
-    }
-
     private void playNext(){
         if(!loop&&!shuffle){
             //If not looping or shuffling, get the next song and play it
@@ -371,21 +391,12 @@ public class mainController{
             playRow(rowData);
         }
     }
-
     private void playLast(){
             int id = tableView.getSelectionModel().getSelectedIndex();
             SongView rowData = tableView.getItems().get(id-1);
             playRow(rowData);
             tableView.getSelectionModel().select(rowData);
     }
-
-    private void playRow(SongView rowData){
-        //playURL();
-        loadIntoPlayer(new File(getPath(rowData.getName())));
-        player.play();
-        paused = false;
-    }
-
     private void handlePlayLast(){
         if(player.getCurrentTime().toSeconds()>3){
             player.seek(Duration.seconds(0));
@@ -393,18 +404,6 @@ public class mainController{
             playLast();
         }
     }
-    /*
-    private void playURL(){
-        File loadMeDad = new File("Controller/LoginScreen.fxml");
-        try {
-            URL url = new URL("http://www.ntonyx.com/mp3files/Morning_Flower.mp3");
 
-            FileUtils.copyURLToFile(url, loadMeDad);
-            loadIntoPlayer(loadMeDad);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
-    */
 
 }

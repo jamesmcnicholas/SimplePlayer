@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" stylesheets="@table-style.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
    <left>
       <VBox prefHeight="291.0" prefWidth="121.0" style="-fx-background-color: #232426;" BorderPane.alignment="CENTER">
          <children>
@@ -141,12 +141,12 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="47.0" prefWidth="275.0" style="-fx-background-color: #232426;">
                      <children>
-                        <CheckBox fx:id="loopBox" mnemonicParsing="false" onAction="#toggleLoop" text="LOOP" textFill="WHITE">
+                        <CheckBox fx:id="loopBox" mnemonicParsing="false" onAction="#toggleLoop" text="🔁" textFill="WHITE">
                            <padding>
                               <Insets right="20.0" />
                            </padding>
                         </CheckBox>
-                        <CheckBox fx:id="shuffleBox" alignment="CENTER" mnemonicParsing="false" onAction="#toggleShuffle" text="SHUFFLE" textFill="WHITE" />
+                        <CheckBox fx:id="shuffleBox" alignment="CENTER" mnemonicParsing="false" onAction="#toggleShuffle" text="🔀" textFill="WHITE" />
                      </children>
                   </HBox>
                </children>
@@ -159,10 +159,10 @@
          <children>
             <HBox prefHeight="48.0" prefWidth="604.0" style="-fx-background-color: #232426;">
                <children>
-                  <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="36.0" prefWidth="583.0" style="-fx-background-color: #161719;" stylesheets="@table-style.css" text="Music Library - *User's Name*" textFill="WHITE" />
+                  <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="36.0" prefWidth="583.0" style="-fx-background-color: #161719;" text="Music Library - *User's Name*" textFill="WHITE" />
                </children>
             </HBox>
-            <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0" stylesheets="@table-style.css">
+            <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0">
               <columns>
                  <TableColumn fx:id="NameColumn" prefWidth="286.0" text="Name" />
                 <TableColumn fx:id="ArtistColumn" minWidth="0.0" prefWidth="222.0" text="Artist" />
