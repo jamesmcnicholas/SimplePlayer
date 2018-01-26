@@ -44,7 +44,7 @@
                <font>
                   <Font name="Microsoft Tai Le Bold" size="12.0" />
                </font></Button>
-            <Button fx:id="queueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#queueButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="QUEUE" textFill="WHITE">
+            <Button fx:id="queueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#queueButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="ENQUEUE" textFill="WHITE">
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>

@@ -115,6 +115,7 @@ public class mainController{
             return row ;
         });
 
+
     }
 
 
@@ -143,7 +144,9 @@ public class mainController{
             System.out.println(n.getMessage());
         }
     }
-    @FXML protected void queueButtonPressed(ActionEvent event){ }
+    @FXML protected void queueButtonPressed(ActionEvent event){
+        queue.add(getSelectedRow());
+        System.out.println("song queued");}
     @FXML protected void addSongButtonPressed(ActionEvent event) {
         //Opens file explorer and gets PATH to music
         Stage stage = new Stage();
@@ -195,7 +198,12 @@ public class mainController{
 
     //Getters for database items
     private String getArtistName(int id){
-        return ArtistDataService.selectByID(id,database).getArtistName();
+        try{
+            return ArtistDataService.selectByID(id,database).getArtistName();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
     private void addSongToDatabase(TrackData track){
         TrackDataService.selectAll(trackList, database);
@@ -371,24 +379,28 @@ public class mainController{
         }
     }
     private void playRow(SongView rowData){
-        //playURL();
         loadIntoPlayer(new File(getPath(rowData.getName())));
         player.play();
         paused = false;
     }
     private void playNext(){
-        if(!loop&&!shuffle){
-            //If not looping or shuffling, get the next song and play it
-            int id = tableView.getSelectionModel().getSelectedIndex();
-            tableView.getSelectionModel().select(id+1);
-            SongView rowData = tableView.getItems().get(id+1);
-            playRow(rowData);
-        }
-        else if(loop){
-            //If loop enabled, reselect the current row and play again
-            int id = tableView.getSelectionModel().getSelectedIndex();
-            SongView rowData = tableView.getItems().get(id);
-            playRow(rowData);
+        //Plays the next item in the queue then removes it if the queue is not empty
+        if(queue.size()!=0){
+            playRow(queue.get(0));
+            queue.remove(0);
+        }else {
+            if (!loop && !shuffle) {
+                //If not looping or shuffling, get the next song and play it
+                int id = tableView.getSelectionModel().getSelectedIndex();
+                tableView.getSelectionModel().select(id + 1);
+                SongView rowData = tableView.getItems().get(id + 1);
+                playRow(rowData);
+            } else if (loop) {
+                //If loop enabled, reselect the current row and play again
+                int id = tableView.getSelectionModel().getSelectedIndex();
+                SongView rowData = tableView.getItems().get(id);
+                playRow(rowData);
+            }
         }
     }
     private void playLast(){
@@ -404,6 +416,5 @@ public class mainController{
             playLast();
         }
     }
-
 
 }
