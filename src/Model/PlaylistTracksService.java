@@ -33,14 +33,13 @@ public class PlaylistTracksService {
     public static PlaylistTracks selectByID(int id, DatabaseConnection database){
         PlaylistTracks result = null;
         PreparedStatement statement = database.newStatement("SELECT playlistID, trackID, FROM PlaylistTracks WHERE id = ?");
-
         try {
             if (statement != null) {
-
                 statement.setInt(1, id);
                 ResultSet results = database.executeQuery(statement);
 
-                if (results != null) {
+                if (results!=null) {
+
                     result = new PlaylistTracks(
                             results.getInt("playlistID"),
                             results.getInt("trackID"));

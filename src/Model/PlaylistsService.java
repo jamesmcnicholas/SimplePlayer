@@ -1,8 +1,11 @@
 package Model;
 
+import javafx.collections.ObservableList;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static Model.DatabaseConnection.deleteFromTable;
@@ -55,6 +58,34 @@ public class PlaylistsService {
         }
         return result;
     }
+
+    public static Playlists selectByUserID(ObservableList<Playlists> targetList, int id, DatabaseConnection database){
+        Playlists result = null;
+        PreparedStatement statement = database.newStatement("SELECTPlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE userID = ?");
+
+        try {
+            if (statement != null) {
+                statement.setInt(1, id);
+                ResultSet results = database.executeQuery(statement);
+
+                if(results!=null){
+                    while(results.next()){
+                        targetList.add(new Playlists(
+                                results.getInt("PlaylistID"),
+                                results.getInt("PlaylistLength"),
+                                results.getString("playlistName"),
+                                results.getInt("userID")
+                        ));
+                    }
+                }
+            }
+        } catch (SQLException resultsException) {
+            System.out.println("Database select by id error: " + resultsException.getMessage());
+        }
+        return result;
+    }
+
+
     public static void save(Playlists itemToSave, DatabaseConnection database){
         Playlists existingItem = null;
         if (itemToSave.getPlaylistID() != 0) existingItem = selectByID(itemToSave.getPlaylistID(), database);

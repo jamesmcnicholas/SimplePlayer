@@ -8,12 +8,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 
 
-import javafx.scene.media.Track;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -21,6 +24,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 
+import java.beans.EventHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -120,9 +124,13 @@ public class mainController{
 
     //Methods for button handling
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
+
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
+
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
+
     @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
+
     @FXML protected void pauseButtonPressed() {
         try {
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
@@ -143,9 +151,24 @@ public class mainController{
             System.out.println(n.getMessage());
         }
     }
-    @FXML protected void queueButtonPressed(ActionEvent event){
-        queue.add(getSelectedRow());
-        System.out.println("song queued");}
+
+    @FXML protected void queueButtonPressed(ActionEvent event) {
+        if (!queue.contains(getSelectedRow())) {
+            queue.add(getSelectedRow());
+            System.out.println("Song queued");
+        }else{
+            System.out.println("Song already queued");
+        }
+    }
+
+    @FXML protected void playNextButtonPressed(ActionEvent event){
+        if(queue.contains(getSelectedRow())){
+            queue.remove(getSelectedRow());
+        }
+        queue.add(0,getSelectedRow());
+        System.out.println("Song moved to start of queue");
+    }
+
     @FXML protected void addSongButtonPressed(ActionEvent event) {
         //Opens file explorer and gets PATH to music
         Stage stage = new Stage();
@@ -170,6 +193,7 @@ public class mainController{
             }
         }
     }
+
     @FXML protected void removeSongButtonPressed(ActionEvent event){
         SongView row = getSelectedRow();
         if(row!=null){
@@ -191,8 +215,19 @@ public class mainController{
             System.out.println("Select a song first");
         }
     }
-    @FXML protected void playNextButtonPressed(ActionEvent event){ System.out.println("song will play next"); }
-    @FXML protected void addToPlaylistButtonPressed(ActionEvent event){ System.out.println("added to playlist"); }
+
+    @FXML protected void addToPlaylistButtonPressed(ActionEvent event) throws IOException{
+        SongView song = tableView.getSelectionModel().getSelectedItem();
+        //Creates a new FXMLLoader object and loads in the main controller
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("playlistScreen.fxml"));
+        playlistController controller = new playlistController();
+        controller.initData(song,user,database);
+        Parent root1 = fxmlLoader.load();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root1));
+        stage.getIcons().add(new Image("sp-logo.png"));
+        stage.show();
+    }
 
 
     //Getters for database items
@@ -248,10 +283,19 @@ public class mainController{
             ParseContext parseCtx = new ParseContext();
             parser.parse(input, handler, metadata, parseCtx);
             input.close();
-
-            int artistID = getArtistID(metadata.get("xmpDM:artist"));
+            int artistID = 0;
+            if(metadata.get("xmpDM:artist")!=null) {
+                artistID = getArtistID(metadata.get("xmpDM:artist"));
+            }
             int duration = convertToSeconds(Double.parseDouble(metadata.get(XMPDM.DURATION)));
-            return new TrackData((metadata.get("title")),duration,artistID,("Songs/"+file.getName()));
+            if(metadata.get("title")!=null){
+                String title = metadata.get("title");
+                return new TrackData(title,duration,artistID,("Songs/"+file.getName()));
+            }else{
+                String title = file.getName();
+                return new TrackData(title,duration,artistID,("Songs/"+file.getName()));
+            }
+
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -308,7 +352,18 @@ public class mainController{
 
         try {
             TrackData playing = getMetadata(f);
-            currentSongText.setText("Now Playing: "+ArtistDataService.selectByID(playing.getArtistID(),database).getArtistName()+" - "+playing.getTrackName());
+            try {
+                String artistName = ArtistDataService.selectByID(playing.getArtistID(), database).getArtistName();
+                if(artistName==null){
+                    artistName = "";
+                }
+                if(playing.getTrackName()==null){
+                    currentSongText.setText("Now Playing: "+artistName+" - "+f.getName());
+                }
+                currentSongText.setText("Now Playing: "+artistName+" - "+playing.getTrackName());
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
             Media pick = new Media(f.toURI().toURL().toString());
             player = new MediaPlayer(pick);
             currentSong = playing;
@@ -326,16 +381,16 @@ public class mainController{
                     player.seek(Duration.seconds(newValue.intValue()));
                 }
             });
-
             playerInitialised = true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        //Plays the next song when current one ends
+        player.setOnEndOfMedia(() -> playNext());
 
         player.setOnReady(() -> {
             progressBar.setMax(player.getTotalDuration().toSeconds());
             lengthLabel.setText(formatTime((int)(Math.round(player.getTotalDuration().toSeconds()))));
-            //todo.implement scrubbing
         });
 
     }
@@ -391,9 +446,15 @@ public class mainController{
             if (!loop && !shuffle) {
                 //If not looping or shuffling, get the next song and play it
                 int id = tableView.getSelectionModel().getSelectedIndex();
-                tableView.getSelectionModel().select(id + 1);
-                SongView rowData = tableView.getItems().get(id + 1);
-                playRow(rowData);
+                if((id+1<tableView.getItems().size())){
+                    tableView.getSelectionModel().select(id + 1);
+                    SongView rowData = tableView.getItems().get(id + 1);
+                    playRow(rowData);
+                } else{
+                    tableView.getSelectionModel().select(0);
+                    SongView rowData=tableView.getItems().get(0);
+                    playRow(rowData);
+                }
             } else if (loop) {
                 //If loop enabled, reselect the current row and play again
                 int id = tableView.getSelectionModel().getSelectedIndex();

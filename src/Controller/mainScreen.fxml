@@ -164,9 +164,9 @@
             </HBox>
             <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0">
               <columns>
-                 <TableColumn fx:id="NameColumn" prefWidth="286.0" text="Name" />
-                <TableColumn fx:id="ArtistColumn" minWidth="0.0" prefWidth="222.0" text="Artist" />
-                  <TableColumn fx:id="LengthColumn" prefWidth="73.0" text="Length" />
+                 <TableColumn fx:id="NameColumn" editable="false" prefWidth="286.0" sortable="false" text="Name" />
+                <TableColumn fx:id="ArtistColumn" editable="false" minWidth="0.0" prefWidth="222.0" sortable="false" text="Artist" />
+                  <TableColumn fx:id="LengthColumn" editable="false" prefWidth="73.0" sortable="false" text="Length" />
               </columns>
             </TableView>
          </children>
