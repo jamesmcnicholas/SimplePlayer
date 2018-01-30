@@ -1,39 +1,22 @@
 package Controller;
 
 import Model.*;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.media.Media;
-
-
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
-
-import java.beans.EventHandler;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
@@ -44,6 +27,10 @@ import org.jetbrains.annotations.Nullable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class mainController{
@@ -124,13 +111,9 @@ public class mainController{
 
     //Methods for button handling
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
-
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
-
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
-
     @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
-
     @FXML protected void pauseButtonPressed() {
         try {
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
@@ -151,7 +134,6 @@ public class mainController{
             System.out.println(n.getMessage());
         }
     }
-
     @FXML protected void queueButtonPressed(ActionEvent event) {
         if (!queue.contains(getSelectedRow())) {
             queue.add(getSelectedRow());
@@ -193,7 +175,6 @@ public class mainController{
             }
         }
     }
-
     @FXML protected void removeSongButtonPressed(ActionEvent event){
         SongView row = getSelectedRow();
         if(row!=null){
@@ -225,7 +206,6 @@ public class mainController{
         Parent root1 = fxmlLoader.load();
         Stage stage = new Stage();
         stage.setScene(new Scene(root1));
-        stage.getIcons().add(new Image("sp-logo.png"));
         stage.show();
     }
 

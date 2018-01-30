@@ -97,7 +97,6 @@ public class loginController {
         } catch (NoSuchAlgorithmException nsae) {
             return nsae.getMessage();
         }
-        //todo.Implement a salt for further security
     }
 
     public void login(ActionEvent event,UserData u,DatabaseConnection d){

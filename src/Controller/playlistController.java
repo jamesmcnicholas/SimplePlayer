@@ -1,6 +1,5 @@
 package Controller;
 
-
 import Model.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,6 +13,7 @@ import javafx.stage.Stage;
 
 
 public class playlistController {
+
     //Variable declarations
     private ObservableList<Playlists> playlistList;
     private UserData currentUser;
