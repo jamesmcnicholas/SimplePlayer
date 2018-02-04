@@ -50,7 +50,7 @@ public class mainController{
     private DatabaseConnection database;
     private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
     private UserData user;
-    File cwd = new File("Songs/").getAbsoluteFile();
+    private File songFolder = new File("Songs/").getAbsoluteFile();
 
 
     //FXML TableView declarations
@@ -162,7 +162,7 @@ public class mainController{
         if(filesToAdd != null){
             for(File f: filesToAdd){
                 try {
-                    copy(f,cwd);
+                    FileUtils.copyFileToDirectory(f, songFolder);
                     File copiedSong = FileUtils.getFile("Songs",f.getName());
                     addSongToDatabase(getMetadata(copiedSong));
                     System.out.println("Success!");
@@ -321,9 +321,6 @@ public class mainController{
                 new FileChooser.ExtensionFilter("MP3", "*.mp3"),
                 new FileChooser.ExtensionFilter("WAV", "*.wav")
         );
-    }
-    private static void copy(File source, File cwd) throws IOException {
-        FileUtils.copyFileToDirectory(source,cwd);
     }
     private void loadIntoPlayer(File f){
         if(playerInitialised){
