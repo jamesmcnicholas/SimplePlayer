@@ -37,7 +37,7 @@ public class PlaylistsService {
     
     public static Playlists selectByID(int id, DatabaseConnection database){
         Playlists result = null;
-        PreparedStatement statement = database.newStatement("SELECTPlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT PlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE id = ?");
 
         try {
             if (statement != null) {
@@ -61,7 +61,7 @@ public class PlaylistsService {
 
     public static Playlists selectByUserID(ObservableList<Playlists> targetList, int id, DatabaseConnection database){
         Playlists result = null;
-        PreparedStatement statement = database.newStatement("SELECTPlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE userID = ?");
+        PreparedStatement statement = database.newStatement("SELECT PlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE userID = ?");
 
         try {
             if (statement != null) {

@@ -87,4 +87,10 @@ public class DatabaseConnection {
         }
     }
 
+    @Override
+    public String toString() {
+        return "DatabaseConnection{" +
+                "connection=" + connection +
+                '}';
+    }
 }

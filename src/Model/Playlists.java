@@ -13,9 +13,10 @@ public class Playlists {
         this.userID = userID;
     }
 
-    public Playlists(String playlistName, int userID){
+    public Playlists(String playlistName, int userID){ ;
         this.playlistName=playlistName;
         this.userID=userID;
+        this.playlistLength=0;
     }
 
     //Getters and Setters
@@ -30,4 +31,15 @@ public class Playlists {
 
     public int getUserID() { return userID; }
     public void setUserID(int userID) { this.userID = userID; }
+
+    @Override
+    public String toString() {
+        return "Playlists{" +
+                "playlistID=" + playlistID +
+                ", playlistLength=" + playlistLength +
+                ", playlistName='" + playlistName + '\'' +
+                ", userID=" + userID +
+                '}';
+    }
 }
+

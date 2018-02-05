@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,6 +11,8 @@ import javafx.scene.control.ListView;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 public class playlistController {
@@ -27,6 +30,8 @@ public class playlistController {
     @FXML private Button deletePlaytlistButton;
     @FXML private Button backButton;
     @FXML private Label songNameLabel;
+    private ObservableList<String> playlistNames = FXCollections.observableArrayList();
+    public DatabaseConnection database;
 
     //Button methods
     @FXML void addSongButtonPressed(ActionEvent event) {}
@@ -38,32 +43,43 @@ public class playlistController {
     @FXML void deletePlaylistButtonPressed(ActionEvent event) {
 
     }
-    @FXML void newPlaylistButtonPressed(ActionEvent event) {
-        String newPlaylist = playlistNameField.getText();
-        if(newPlaylist!=null){
-            Playlists playlist = (new Playlists(newPlaylist,currentUser.getUserID()));
-            playlistsListView.getItems().add(playlist.getPlaylistName());
 
+    @FXML protected void newPlaylistButtonPressed(ActionEvent event) {
+        String newPlaylist = playlistNameField.getText();
+
+        System.out.println("database:"+ this.database);
+        Playlists playlist = new Playlists("Test",1);
+        System.out.println(playlist);
+        PlaylistsService.selectAll(playlistList,database);
+        if (!playlistList.contains(playlist)) {
+            PlaylistsService.save(playlist, database);
+            updateListView();
         }
     }
+
     @FXML void removeSongButtonPressed(ActionEvent event) {
 
     }
 
     public void initData(SongView song, UserData user,DatabaseConnection database){
         this.currentUser=user;
-        System.out.println(user);
+        this.database=database;
+
         if(song==null || song.getName()==null || song.getArtist()==null){
             System.out.println("broken");
-            try{
-                songNameLabel.setText("Selected: "+song.getName()+" - "+song.getArtist());
-            }catch (Exception e){ System.out.println(e.getMessage()); }
-
-            PlaylistsService.selectByUserID(playlistList,user.getUserID(),database);
-            for(Playlists p :playlistList){
-                playlistsListView.getItems().add(p.getPlaylistName());
-            }
+        }else{
+            songNameLabel.setText("Selected: "+song.getName()+" - "+song.getArtist());
         }
-
     }
+
+    private void updateListView(){
+        PlaylistsService.selectByUserID(playlistList,currentUser.getUserID(),database);
+        for(Playlists p :playlistList){
+            playlistNames.add(p.getPlaylistName());
+        }
+        playlistsListView.setItems(playlistNames);
+    }
+
+
 }
+
