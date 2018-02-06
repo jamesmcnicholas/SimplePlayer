@@ -113,7 +113,13 @@ public class mainController{
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
-    @FXML protected void prevButtonPressed(ActionEvent event){ handlePlayLast(); }
+    @FXML protected void prevButtonPressed(ActionEvent event){
+        if(player.getCurrentTime().toSeconds()>3){
+          player.seek(Duration.seconds(0));
+        }else{
+          playLast();
+        }
+    }
     @FXML protected void pauseButtonPressed() {
         try {
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
@@ -423,38 +429,40 @@ public class mainController{
             playRow(queue.get(0));
             queue.remove(0);
         }else {
+            int id=0;
             if (!loop && !shuffle) {
                 //If not looping or shuffling, get the next song and play it
-                int id = tableView.getSelectionModel().getSelectedIndex();
+                id = tableView.getSelectionModel().getSelectedIndex();
                 if((id+1<tableView.getItems().size())){
                     tableView.getSelectionModel().select(id + 1);
-                    SongView rowData = tableView.getItems().get(id + 1);
-                    playRow(rowData);
                 } else{
+                    // If the item is out of range, resets it to the first
                     tableView.getSelectionModel().select(0);
-                    SongView rowData=tableView.getItems().get(0);
-                    playRow(rowData);
                 }
             } else if (loop) {
                 //If loop enabled, reselect the current row and play again
-                int id = tableView.getSelectionModel().getSelectedIndex();
-                SongView rowData = tableView.getItems().get(id);
-                playRow(rowData);
+                id = tableView.getSelectionModel().getSelectedIndex();
+            } else {
+                // Shuffle is chosen, picks a random song
+                id = randomBetween(0,tableView.getItems().size());
+                tableView.getSelectionModel().select(id);
             }
+            // Finally plays the selected id
+            playRow(tableView.getItems().get(id));
         }
     }
+
     private void playLast(){
         int id = tableView.getSelectionModel().getSelectedIndex();
         SongView rowData = tableView.getItems().get(id-1);
         playRow(rowData);
         tableView.getSelectionModel().select(rowData);
     }
-    private void handlePlayLast(){
-        if(player.getCurrentTime().toSeconds()>3){
-            player.seek(Duration.seconds(0));
-        }else{
-            playLast();
-        }
+
+    private int randomBetween(int min, int max){
+            int range = (max - min) + 1;
+            return (int)(Math.random() * range) + min;
     }
+
 
 }
