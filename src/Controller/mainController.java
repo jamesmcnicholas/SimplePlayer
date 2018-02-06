@@ -29,7 +29,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class mainController{
     private DatabaseConnection database;
     private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
     private UserData user;
-    private File songFolder = new File("Songs/").getAbsoluteFile();
+    File cwd = new File("Songs/").getAbsoluteFile();
 
 
     //FXML TableView declarations
@@ -92,10 +91,9 @@ public class mainController{
         ArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Artist"));
         LengthColumn.setCellValueFactory(new PropertyValueFactory<>("Length"));
 
-        //Load table data
+        //Load dummy data
         tableView.setItems(initialiseTable());
 
-        //Allows double clicking to play
         tableView.setRowFactory( tv -> {
             TableRow<SongView> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -164,7 +162,7 @@ public class mainController{
         if(filesToAdd != null){
             for(File f: filesToAdd){
                 try {
-                    FileUtils.copyFileToDirectory(f, songFolder);
+                    copy(f,cwd);
                     File copiedSong = FileUtils.getFile("Songs",f.getName());
                     addSongToDatabase(getMetadata(copiedSong));
                     System.out.println("Success!");
@@ -178,17 +176,17 @@ public class mainController{
         }
     }
     @FXML protected void removeSongButtonPressed(ActionEvent event){
-        // Retrieves the selected table row
         SongView row = getSelectedRow();
         if(row!=null){
-            // So long as the row exists, retrieves the associated Track
             TrackData track = getTrackFromName(row.getName());
-            // Get the ID of the selected track, and delete it from the database
+            System.out.println(track.getTrackName());
+
+
+            System.out.println(track.getTrackID());
             TrackDataService.deleteByID(track.getTrackID(),database);
-            // Removes the row from the TableView
+
             tableSongs.remove(row);
 
-            // Deletes the file from the songs folder
             try {
                 FileUtils.forceDelete(FileUtils.getFile(track.getPath()));
             }catch (IOException i){
@@ -205,7 +203,6 @@ public class mainController{
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("playlistScreen.fxml"));
         playlistController controller = new playlistController();
         controller.initData(song,user,database);
-        System.out.println(database);
         Parent root1 = fxmlLoader.load();
         Stage stage = new Stage();
         stage.setScene(new Scene(root1));
@@ -239,27 +236,23 @@ public class mainController{
         }
     }
     private int getArtistID(String artist) {
-        //If the string contains any text, populate an ArrayList with all artists
         if (artist != null) {
             ArrayList<ArtistData> artistList = new ArrayList<>();
             ArtistDataService.selectAll(artistList, database);
-            //If any of the artists match the one found, return the ID
             for (ArtistData a : artistList) {
-                if (artist.equalsIgnoreCase(a.getArtistName())) {
+                if (artist.equals(a.getArtistName())) {
                     return a.getArtistID();
                 }
             }
-            //If the artist is not found, add it to the database
             ArtistData newArtist = new ArtistData((artist));
             ArtistDataService.save(newArtist, database);
             System.out.println("Artist not found, adding to database");
-            //Calls the method again recursively to retrieve the new ID
             return getArtistID(artist);
         }
         return 0;
     }
     @Nullable
-    private TrackData getMetadata(File file){
+    private TrackData getMetadata(File file) throws Exception{
         String fileLocation = file.getAbsolutePath();
         try {
 
@@ -329,47 +322,49 @@ public class mainController{
                 new FileChooser.ExtensionFilter("WAV", "*.wav")
         );
     }
-    private void loadIntoPlayer(File f)  {
+    private static void copy(File source, File cwd) throws IOException {
+        FileUtils.copyFileToDirectory(source,cwd);
+    }
+    private void loadIntoPlayer(File f){
         if(playerInitialised){
             player.stop();
         }
 
-        TrackData playing = getMetadata(f);
-
-        String artistName = ArtistDataService.selectByID(playing.getArtistID(), database).getArtistName();
-        if(artistName==null){
-            artistName = "";
-        }
-        if(playing.getTrackName()==null){
-            currentSongText.setText("Now Playing: "+artistName+" - "+f.getName());
-        } else {
-            currentSongText.setText("Now Playing: "+artistName+" - "+playing.getTrackName());
-        }
-
         try {
+            TrackData playing = getMetadata(f);
+            try {
+                String artistName = ArtistDataService.selectByID(playing.getArtistID(), database).getArtistName();
+                if(artistName==null){
+                    artistName = "";
+                }
+                if(playing.getTrackName()==null){
+                    currentSongText.setText("Now Playing: "+artistName+" - "+f.getName());
+                }
+                currentSongText.setText("Now Playing: "+artistName+" - "+playing.getTrackName());
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
             Media pick = new Media(f.toURI().toURL().toString());
             player = new MediaPlayer(pick);
             currentSong = playing;
             player.setVolume(currentVolume);
-        }catch (MalformedURLException m){
-            System.out.println(m.getMessage());
+
+            player.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                if(!paused) {
+                    progressBar.setValue(newValue.toSeconds());
+                }
+                currentTimeLabel.setText(formatTime((int)Math.round(newValue.toSeconds())));
+            });
+
+            progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
+                if((((oldValue.intValue()+1)<(newValue.intValue()) || ((oldValue.intValue()-1)>(newValue.intValue()))))){
+                    player.seek(Duration.seconds(newValue.intValue()));
+                }
+            });
+            playerInitialised = true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        player.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-            if(!paused) {
-                progressBar.setValue(newValue.toSeconds());
-            }
-            currentTimeLabel.setText(formatTime((int)Math.round(newValue.toSeconds())));
-        });
-
-        progressBar.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if((((oldValue.intValue()+1)<(newValue.intValue()) || ((oldValue.intValue()-1)>(newValue.intValue()))))){
-                player.seek(Duration.seconds(newValue.intValue()));
-            }
-        });
-
-        playerInitialised = true;
-
         //Plays the next song when current one ends
         player.setOnEndOfMedia(() -> playNext());
 
@@ -410,14 +405,10 @@ public class mainController{
     }
     @Nullable
     private SongView getSelectedRow(){
-        // If a row is selected, creates a new SongView object
         if(tableView.getSelectionModel().getSelectedItem()!=null) {
-            // Sets this object to the selected item from the TableView
             SongView newSong = tableView.getSelectionModel().getSelectedItem();
-            // Returns the SongView object
             return (newSong);
         }else{
-            //If no song is selected, return null
             return null;
         }
     }
@@ -453,10 +444,10 @@ public class mainController{
         }
     }
     private void playLast(){
-            int id = tableView.getSelectionModel().getSelectedIndex();
-            SongView rowData = tableView.getItems().get(id-1);
-            playRow(rowData);
-            tableView.getSelectionModel().select(rowData);
+        int id = tableView.getSelectionModel().getSelectedIndex();
+        SongView rowData = tableView.getItems().get(id-1);
+        playRow(rowData);
+        tableView.getSelectionModel().select(rowData);
     }
     private void handlePlayLast(){
         if(player.getCurrentTime().toSeconds()>3){
