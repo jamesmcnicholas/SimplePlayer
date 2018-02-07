@@ -30,16 +30,28 @@ public class playlistController {
     @FXML private Button deletePlaytlistButton;
     @FXML private Button backButton;
     @FXML private Label songNameLabel;
+    @FXML private Label yourPlaylistsLabel;
+
     private ObservableList<String> playlistNames = FXCollections.observableArrayList();
-    public DatabaseConnection database;
+    private DatabaseConnection database = Main.database;
+    private SongView song = mainController.selectedSong;
+
+    public void initialize(){
+
+        songNameLabel.setText("Selected song: "+ song.getName());
+
+        PlaylistsService.selectAll(playlistList,database);
+    }
 
     //Button methods
     @FXML void addSongButtonPressed(ActionEvent event) {}
+
     @FXML void backButtonPressed(ActionEvent event) {
         //Gets a handle to the stage
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.close();
     }
+
     @FXML void deletePlaylistButtonPressed(ActionEvent event) {
 
     }
@@ -48,28 +60,18 @@ public class playlistController {
         String newPlaylist = playlistNameField.getText();
 
         System.out.println("database:"+ this.database);
-        Playlists playlist = new Playlists("Test",1);
-        System.out.println(playlist);
-        PlaylistsService.selectAll(playlistList,database);
-        if (!playlistList.contains(playlist)) {
-            PlaylistsService.save(playlist, database);
-            updateListView();
+        Playlists playlist = new Playlists(newPlaylist,1);
+        try{
+                PlaylistsService.save(playlist, database);
+                updateListView();
+
+        }catch (NullPointerException n){
+            System.out.println(n.getMessage() + n.getCause());
         }
     }
 
     @FXML void removeSongButtonPressed(ActionEvent event) {
 
-    }
-
-    public void initData(SongView song, UserData user,DatabaseConnection database){
-        this.currentUser=user;
-        this.database=database;
-
-        if(song==null || song.getName()==null || song.getArtist()==null){
-            System.out.println("broken");
-        }else{
-            songNameLabel.setText("Selected: "+song.getName()+" - "+song.getArtist());
-        }
     }
 
     private void updateListView(){

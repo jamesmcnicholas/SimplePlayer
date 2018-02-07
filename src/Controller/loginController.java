@@ -71,7 +71,7 @@ public class loginController {
                 //The given password is hashed and checked against the stored hash
                 if (generateHash(passwordField.getText()).equals(u.getPassword())) {
                     //If they match, the user is logged in
-                    login(event, u, database);
+                    login(event, u);
                     loggedIn = true;
                     invalidPass = false;
                     break;
@@ -89,7 +89,7 @@ public class loginController {
         }
 
     //Method used for hashing passwords with the SHA-1 algorithm
-    public static String generateHash(String text) {
+    private static String generateHash(String text) {
         try {
             MessageDigest hasher = MessageDigest.getInstance("SHA-256");
             hasher.update(text.getBytes());
@@ -99,7 +99,7 @@ public class loginController {
         }
     }
 
-    public void login(ActionEvent event,UserData u,DatabaseConnection d){
+    private void login(ActionEvent event,UserData u){
         try {
             //Creates a new FXMLLoader object and loads in the main controller
             FXMLLoader loader = new FXMLLoader();
@@ -111,7 +111,7 @@ public class loginController {
 
             //Runs the initial setup for the main screen, passing in the user and database connection
             mainController controller = loader.getController();
-            controller.initData(u,d);
+            controller.initData(u);
 
             //Gets the stage info
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();

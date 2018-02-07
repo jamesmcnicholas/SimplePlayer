@@ -47,10 +47,11 @@ public class mainController{
     private ArrayList<SongView> queue = new ArrayList<>();
 
     //Other declarations
-    private DatabaseConnection database;
+    private DatabaseConnection database = Main.database;
     private ObservableList<SongView> tableSongs = FXCollections.observableArrayList();
     private UserData user;
-    File cwd = new File("Songs/").getAbsoluteFile();
+    private File cwd = new File("Songs/").getAbsoluteFile();
+    public static SongView selectedSong;
 
 
     //FXML TableView declarations
@@ -67,13 +68,14 @@ public class mainController{
     @FXML private Label currentSongText;
     @FXML private Label currentTimeLabel;
     @FXML private Label lengthLabel;
+    @FXML private TextField searchField;
 
     //Method for initialising the database and other items
-    public void initData(UserData user,DatabaseConnection d) {
+    public void initData(UserData user) {
         this.user = user;
+
         nameDisplayLabel.setText("Music Library - " + this.user.getUsername());
 
-        database = d;
         volumeSlider.setMin(0);
         volumeSlider.setMax(100);
         volumeSlider.setValue(100);
@@ -85,6 +87,9 @@ public class mainController{
         });
 
         progressBar.setMin(0);
+
+        // Means trackList only has to be populated once
+        TrackDataService.selectAll(trackList,database);
 
         //Sets up columns
         NameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -111,8 +116,11 @@ public class mainController{
 
     //Methods for button handling
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
+
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
+
     @FXML protected void nextButtonPressed(ActionEvent event){ playNext(); }
+
     @FXML protected void prevButtonPressed(ActionEvent event){
         if(player.getCurrentTime().toSeconds()>3){
           player.seek(Duration.seconds(0));
@@ -120,6 +128,7 @@ public class mainController{
           playLast();
         }
     }
+
     @FXML protected void pauseButtonPressed() {
         try {
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
@@ -140,6 +149,7 @@ public class mainController{
             System.out.println(n.getMessage());
         }
     }
+
     @FXML protected void queueButtonPressed(ActionEvent event) {
         if (!queue.contains(getSelectedRow())) {
             queue.add(getSelectedRow());
@@ -181,12 +191,11 @@ public class mainController{
             }
         }
     }
+
     @FXML protected void removeSongButtonPressed(ActionEvent event){
         SongView row = getSelectedRow();
         if(row!=null){
             TrackData track = getTrackFromName(row.getName());
-            System.out.println(track.getTrackName());
-
 
             System.out.println(track.getTrackID());
             TrackDataService.deleteByID(track.getTrackID(),database);
@@ -203,16 +212,47 @@ public class mainController{
         }
     }
 
-    @FXML protected void addToPlaylistButtonPressed(ActionEvent event) throws IOException{
+    @FXML protected void addToPlaylistButtonPressed(ActionEvent event) {
         SongView song = tableView.getSelectionModel().getSelectedItem();
-        //Creates a new FXMLLoader object and loads in the main controller
+        //Creates a new FXMLLoader object and loads in the playlist controller
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("playlistScreen.fxml"));
-        playlistController controller = new playlistController();
-        controller.initData(song,user,database);
-        Parent root1 = fxmlLoader.load();
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root1));
-        stage.show();
+        selectedSong = tableView.getSelectionModel().getSelectedItem();
+        try{
+            Parent root1 = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException i){
+            System.out.println(i.getMessage());
+        }
+    }
+
+    @FXML protected void searchButtonPressed(ActionEvent event){
+        ObservableList<SongView> rowResults = FXCollections.observableArrayList();
+        ArrayList<TrackData> results = new ArrayList<>();
+        tableView.setItems(null);
+        if(searchField.getText()!=null){
+            for(TrackData t : trackList){
+                if(t.getTrackName().contains(searchField.getText())){
+                    results.add(t);
+                }
+            }
+
+            for(TrackData t: results){
+                String artist = getArtistName(t.getArtistID());
+                SongView newRow = new SongView(t.getTrackName(),artist,formatTime(t.getLength()));
+                rowResults.add(newRow);
+            }
+            tableView.setItems(rowResults);
+            tableView.refresh();
+        }
+    }
+
+    @FXML protected void closeSearchButtonPressed(ActionEvent event){
+        if(!searchField.getText().equalsIgnoreCase("")){
+            searchField.setText("");
+            tableView.setItems(tableSongs);
+        }
     }
 
 
@@ -225,6 +265,7 @@ public class mainController{
             return null;
         }
     }
+
     private void addSongToDatabase(TrackData track){
         TrackDataService.selectAll(trackList, database);
         boolean trackExists = false;
@@ -241,6 +282,7 @@ public class mainController{
             System.out.println("Track is already in library");
         }
     }
+
     private int getArtistID(String artist) {
         if (artist != null) {
             ArrayList<ArtistData> artistList = new ArrayList<>();
@@ -257,6 +299,7 @@ public class mainController{
         }
         return 0;
     }
+
     @Nullable
     private TrackData getMetadata(File file) throws Exception{
         String fileLocation = file.getAbsolutePath();
@@ -294,6 +337,7 @@ public class mainController{
         }
         return null;
     }
+
     @Nullable
     private String getPath(String name){
         ArrayList<TrackData> tracks = new ArrayList<>();
@@ -305,10 +349,9 @@ public class mainController{
         }
         return null;
     }
+
     private TrackData getTrackFromName(String trackName) {
         if (trackName != null) {
-            ArrayList<TrackData> trackList = new ArrayList<>();
-            TrackDataService.selectAll(trackList, database);
             for (TrackData t : trackList) {
                 if (trackName.equals(t.getTrackName())) {
                     System.out.println("Track id: "+t.getTrackID());
@@ -319,6 +362,7 @@ public class mainController{
         return null;
     }
 
+
     //File handling methods
     private static void configureFileChooser(final FileChooser fileChooser) {
         fileChooser.setTitle("View Music");
@@ -328,9 +372,11 @@ public class mainController{
                 new FileChooser.ExtensionFilter("WAV", "*.wav")
         );
     }
+
     private static void copy(File source, File cwd) throws IOException {
         FileUtils.copyFileToDirectory(source,cwd);
     }
+
     private void loadIntoPlayer(File f){
         if(playerInitialised){
             player.stop();
@@ -381,10 +427,12 @@ public class mainController{
 
     }
 
+
     //Time formatting methods
     private int convertToSeconds(double milli){
         return (int)(milli/1000);
     }
+
     private String formatTime(int time){
         String formattedTime;
         if((time%60)<10){ formattedTime=((time /60)+":0"+(time%60));
@@ -394,10 +442,9 @@ public class mainController{
         return formattedTime;
     }
 
+
     //TableView methods
     private ObservableList<SongView> initialiseTable(){
-        TrackDataService.selectAll(trackList, database);
-
         for(TrackData t:trackList){
             String artist = getArtistName(t.getArtistID());
             SongView newRow = new SongView(t.getTrackName(),artist,formatTime(t.getLength()));
@@ -405,10 +452,12 @@ public class mainController{
         }
         return tableSongs;
     }
+
     private ObservableList<SongView> addToTable(TrackData track){
         tableSongs.add(new SongView(track.getTrackName(),getArtistName(track.getArtistID()),formatTime(track.getLength())));
         return tableSongs;
     }
+
     @Nullable
     private SongView getSelectedRow(){
         if(tableView.getSelectionModel().getSelectedItem()!=null) {
@@ -418,37 +467,42 @@ public class mainController{
             return null;
         }
     }
+
     private void playRow(SongView rowData){
         loadIntoPlayer(new File(getPath(rowData.getName())));
         player.play();
         paused = false;
     }
+
     private void playNext(){
         //Plays the next item in the queue then removes it if the queue is not empty
         if(queue.size()!=0){
             playRow(queue.get(0));
             queue.remove(0);
         }else {
-            int id=0;
+            int index=0;
             if (!loop && !shuffle) {
                 //If not looping or shuffling, get the next song and play it
-                id = tableView.getSelectionModel().getSelectedIndex();
-                if((id+1<tableView.getItems().size())){
-                    tableView.getSelectionModel().select(id + 1);
+                index = tableView.getSelectionModel().getSelectedIndex();
+                if((index+1<tableView.getItems().size())){
+                    tableView.getSelectionModel().select(index + 1);
                 } else{
                     // If the item is out of range, resets it to the first
                     tableView.getSelectionModel().select(0);
                 }
             } else if (loop) {
                 //If loop enabled, reselect the current row and play again
-                id = tableView.getSelectionModel().getSelectedIndex();
+                index = tableView.getSelectionModel().getSelectedIndex();
             } else {
                 // Shuffle is chosen, picks a random song
-                id = randomBetween(0,tableView.getItems().size());
-                tableView.getSelectionModel().select(id);
+                while (index==tableView.getSelectionModel().getSelectedIndex()){
+                    // Picks a random index that isn't the current song
+                    index = randomBetween(0,tableView.getItems().size());
+                }
+                tableView.getSelectionModel().select(index);
             }
             // Finally plays the selected id
-            playRow(tableView.getItems().get(id));
+            playRow(tableView.getItems().get(index));
         }
     }
 

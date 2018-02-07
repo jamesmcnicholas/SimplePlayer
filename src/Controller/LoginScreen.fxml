@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="227.0" prefWidth="336.0" style="-fx-background-color: #232426;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.loginController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="172.0" prefWidth="336.0" style="-fx-background-color: #232426;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.loginController">
    <children>
       <TextField fx:id="usernameField" layoutX="43.0" layoutY="36.0" prefHeight="25.0" prefWidth="257.0" promptText="Username" style="-fx-background-color: #4c4c4c; -fx-text-fill: white;" />
       <PasswordField fx:id="passwordField" layoutX="43.0" layoutY="73.0" prefHeight="25.0" prefWidth="257.0" promptText="Password" style="-fx-background-color: #4c4c4c; -fx-text-fill: white;" />
@@ -24,10 +24,6 @@
          </font>
          <effect>
             <InnerShadow />
-         </effect></Button>
-      <Button fx:id="forgotPasswordButton" layoutX="97.0" layoutY="171.0" mnemonicParsing="false" onAction="#forgotPasswordButtonPress" prefHeight="25.0" prefWidth="149.0" style="-fx-background-color: #161719;" text="Forgot Password?" textFill="WHITE">
-         <effect>
-            <InnerShadow blurType="ONE_PASS_BOX" height="121.81" radius="35.2025" />
          </effect></Button>
    </children>
 </Pane>

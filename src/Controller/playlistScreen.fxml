@@ -15,7 +15,7 @@
    <left>
       <VBox alignment="CENTER" prefHeight="250.0" prefWidth="206.0" BorderPane.alignment="CENTER">
          <children>
-            <Label alignment="CENTER" prefHeight="17.0" prefWidth="112.0" text="Your Playlists" textFill="WHITE">
+            <Label fx:id="yourPlaylistsLabel" alignment="CENTER" prefHeight="17.0" prefWidth="112.0" text="Your Playlists" textFill="WHITE">
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>
