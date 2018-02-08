@@ -35,7 +35,7 @@ public class TrackDataService {
 
     public static TrackData selectByID(int id, DatabaseConnection database){
         TrackData result = null;
-        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID, path FROM TrackData WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT trackID, trackName, length, artistID, path FROM TrackData WHERE trackID = ?");
 
         try {
             if (statement != null) {

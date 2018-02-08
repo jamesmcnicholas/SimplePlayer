@@ -13,10 +13,15 @@ public class Playlists {
         this.userID = userID;
     }
 
-    public Playlists(String playlistName, int userID){ ;
+    public Playlists(int playlistID, String playlistName, int userID) {
+        this.playlistID = playlistID;
+        this.playlistName = playlistName;
+        this.userID = userID;
+    }
+
+    public Playlists(String playlistName, int userID){
         this.playlistName=playlistName;
         this.userID=userID;
-        this.playlistLength=0;
     }
 
     //Getters and Setters

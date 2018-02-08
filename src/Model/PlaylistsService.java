@@ -37,7 +37,7 @@ public class PlaylistsService {
     
     public static Playlists selectByID(int id, DatabaseConnection database){
         Playlists result = null;
-        PreparedStatement statement = database.newStatement("SELECT PlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT PlaylistID, playlistName, PlaylistLength, userID FROM Playlists WHERE playlistID = ?");
 
         try {
             if (statement != null) {
@@ -92,19 +92,17 @@ public class PlaylistsService {
 
         try {
             if (existingItem == null) {
-                PreparedStatement statement = database.newStatement("INSERT INTO Playlists (PlaylistID, playlistName, PlaylistLength, userID) VALUES (?, ?, ?, ?)");
-                statement.setInt(1, itemToSave.getPlaylistID());
-                statement.setString(2, itemToSave.getPlaylistName());
-                statement.setInt(3,itemToSave.getPlaylistLength());
-                statement.setInt(4,itemToSave.getUserID());
+                PreparedStatement statement = database.newStatement("INSERT INTO Playlists (playlistName, PlaylistLength, userID) VALUES (?, ?, ?)");
+                statement.setString(1, itemToSave.getPlaylistName());
+                statement.setInt(2,itemToSave.getPlaylistLength());
+                statement.setInt(3,itemToSave.getUserID());
                 database.executeUpdate(statement);
             }
             else {
-                PreparedStatement statement = database.newStatement("UPDATE Playlists SET PlaylistID, playlistName, PlaylistLength, userID = ?, WHERE PlaylistID = ?");
-                statement.setInt(1, itemToSave.getPlaylistID());
-                statement.setString(2, itemToSave.getPlaylistName());
-                statement.setInt(3,itemToSave.getPlaylistLength());
-                statement.setInt(4,itemToSave.getUserID());
+                PreparedStatement statement = database.newStatement("UPDATE Playlists SET playlistName, PlaylistLength, userID = ?, WHERE PlaylistID = ?");
+                statement.setString(1, itemToSave.getPlaylistName());
+                statement.setInt(2,itemToSave.getPlaylistLength());
+                statement.setInt(3,itemToSave.getUserID());
                 database.executeUpdate(statement);
             }
         } catch (SQLException resultsException) {

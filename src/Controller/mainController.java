@@ -2,6 +2,7 @@ package Controller;
 
 import Model.*;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -54,11 +55,26 @@ public class mainController{
     public static SongView selectedSong;
 
 
+    //Playlist control declarations
+    @FXML private TextField playlistNameField;
+    private ArrayList<Playlists> allPlaylists = new ArrayList<>();
+    private ObservableList<String> playlistNames = FXCollections.observableArrayList();
+    private Playlists selectedPlaylist;
+    private ObservableList<Playlists> sessionPlaylists = FXCollections.observableArrayList();
+    @FXML private ChoiceBox<String> playlistChoiceBox;
+    @FXML private Tab playlistTab;
+
+
     //FXML TableView declarations
     @FXML private TableView<SongView> tableView;
     @FXML private TableColumn<SongView,SimpleStringProperty> NameColumn;
     @FXML private TableColumn<SongView,SimpleStringProperty> ArtistColumn;
     @FXML private TableColumn<SongView,SimpleStringProperty> LengthColumn;
+
+    @FXML private TableView<SongView> playlistTableView;
+    @FXML private TableColumn<SongView,SimpleStringProperty> playlistNameColumn;
+    @FXML private TableColumn<SongView,SimpleStringProperty> playlistArtistColumn;
+    @FXML private TableColumn<SongView,SimpleStringProperty> playlistLengthColumn;
 
     //Other FXML Declarations
     @FXML private Label volumeLabel;
@@ -82,8 +98,10 @@ public class mainController{
         volumeLabel.setText("VOLUME: 100%");
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             volumeLabel.setText("VOLUME: " + newValue.intValue() + "%");
-            player.setVolume(newValue.doubleValue() / 100);
-            currentVolume = (newValue.doubleValue() / 100);
+            if(playerInitialised){
+                player.setVolume(newValue.doubleValue() / 100);
+                currentVolume = (newValue.doubleValue() / 100);
+            }
         });
 
         progressBar.setMin(0);
@@ -95,6 +113,10 @@ public class mainController{
         NameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
         ArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Artist"));
         LengthColumn.setCellValueFactory(new PropertyValueFactory<>("Length"));
+
+        playlistNameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        playlistArtistColumn.setCellValueFactory(new PropertyValueFactory<>("Artist"));
+        playlistLengthColumn.setCellValueFactory(new PropertyValueFactory<>("Length"));
 
         //Load dummy data
         tableView.setItems(initialiseTable());
@@ -110,11 +132,55 @@ public class mainController{
             return row ;
         });
 
+        // Sets up a list of all playlists
+        PlaylistsService.selectAll(allPlaylists,database);
+        // Text item providing instruction to the user
+        playlistNames.add("Choose a playlist");
+
+        // Searches through playlists for ones matching the current user's ID
+        for(Playlists p : allPlaylists){
+            if(p.getUserID()==user.getUserID()){
+                // Adds them to a list, as well as the names to another list
+                sessionPlaylists.add(p);
+                playlistNames.add(p.getPlaylistName());
+            }
+        }
+
+        // Options in the choiceBox are set to the list of playlist names
+        playlistChoiceBox.setItems(playlistNames);
+        // A listener that checks for a change of selected item in the choiceBox
+        playlistChoiceBox.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            Boolean found = false;
+            PlaylistsService.selectByUserID(sessionPlaylists,user.getUserID(),database);
+            for(Playlists p : sessionPlaylists){
+                if(p.getPlaylistName().equals(playlistNames.get(newValue.intValue()))){
+                    selectedPlaylist = p;
+                    playlistTab.setText("Playlist: " + selectedPlaylist.getPlaylistName());
+                    found = true;
+                    playlistTableView.setItems(getPlaylistItems());
+                    break;
+                }
+            }
+            if (!found) {
+                playlistTab.setText("Select a playlist");
+                selectedPlaylist = null;
+                playlistTableView.setItems(null);
+            }
+        });
+        //Allows double clicking to play playlist songs
+        playlistTableView.setRowFactory(tv -> { TableRow<SongView> row = new TableRow<>();row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                SongView rowData = row.getItem();
+                playRow(rowData);
+                }
+        });
+            return row ;
+        });
 
     }
 
 
-    //Methods for button handling
+    // Library control methods
     @FXML protected void toggleLoop(ActionEvent event){ loop = !loop; }
 
     @FXML protected void toggleShuffle(ActionEvent event){ shuffle = !shuffle; }
@@ -228,9 +294,14 @@ public class mainController{
     }
 
     @FXML protected void searchButtonPressed(ActionEvent event){
+        // Holds the results of the query
         ObservableList<SongView> rowResults = FXCollections.observableArrayList();
         ArrayList<TrackData> results = new ArrayList<>();
+
+        // Wipes the TableView
         tableView.setItems(null);
+
+        // If the search box contains a query, searches for matching song titles
         if(searchField.getText()!=null){
             for(TrackData t : trackList){
                 if(t.getTrackName().contains(searchField.getText())){
@@ -238,22 +309,82 @@ public class mainController{
                 }
             }
 
+            // For every matching result, creates a new table row and adds it to a list
             for(TrackData t: results){
                 String artist = getArtistName(t.getArtistID());
                 SongView newRow = new SongView(t.getTrackName(),artist,formatTime(t.getLength()));
                 rowResults.add(newRow);
             }
+
+            // Sets the contents of the table to the new rows and updates the table
             tableView.setItems(rowResults);
             tableView.refresh();
         }
     }
 
     @FXML protected void closeSearchButtonPressed(ActionEvent event){
+        // If the search field contains anything, clear it
         if(!searchField.getText().equalsIgnoreCase("")){
             searchField.setText("");
-            tableView.setItems(tableSongs);
+        }
+        // Resets the TableView back to the full library
+        tableView.setItems(tableSongs);
+    }
+
+
+    //Playlist control methods
+    @FXML protected void newPlaylistButtonPressed(ActionEvent event){
+
+        boolean exists = false;
+        String newPlaylist = playlistNameField.getText();
+        if(newPlaylist!=null || newPlaylist!=""){
+            for(Playlists p : sessionPlaylists){
+                if(p.getPlaylistName().equalsIgnoreCase(newPlaylist)){
+                    exists = true;
+                }
+
+            }
+            if(!exists){
+                System.out.println("New Playlist: "+newPlaylist);
+                PlaylistsService.save(new Playlists(newPlaylist,user.getUserID()),database);
+                playlistNameField.setText("");
+                playlistNames.add(newPlaylist);
+                playlistChoiceBox.setItems(playlistNames);
+            }
         }
     }
+
+    @FXML protected void deletePlaylistButtonPressed(ActionEvent event){
+
+        // Clears the database of the track records the the playlist
+        ArrayList<PlaylistTracks> playlistTracks = new ArrayList<>();
+        PlaylistTracksService.selectAll(playlistTracks,database);
+        for(PlaylistTracks p: playlistTracks){
+            if(p.getPlaylistID()==selectedPlaylist.getPlaylistID()){
+                PlaylistTracksService.deleteByID(p.getPlaylistID(),database);
+            }
+        }
+        //Deletes the playlist
+        PlaylistsService.deleteByID(selectedPlaylist.getPlaylistID(),database);
+
+        allPlaylists.remove(selectedPlaylist.getPlaylistID());
+        playlistNames.remove(selectedPlaylist.getPlaylistID());
+        playlistTableView.refresh();
+        playlistChoiceBox.setItems(playlistNames);
+    }
+
+    @FXML protected void addSelectedSongButtonPressed(ActionEvent event) {
+        SongView selectedSong = tableView.getSelectionModel().getSelectedItem();
+        int trackID = getTrackFromName(selectedSong.getName()).getTrackID();
+        PlaylistTracksService.save(new PlaylistTracks(selectedPlaylist.getPlaylistID(), trackID), database);
+
+        updateSelectedPlaylist();
+    }
+
+    @FXML protected void removeSelectedSongButtonPressec(ActionEvent event){
+        System.out.println("Removed Song");
+    }
+
 
 
     //Getters for database items
@@ -518,5 +649,53 @@ public class mainController{
             return (int)(Math.random() * range) + min;
     }
 
+    //Gets rows for playlist TableView
+    private ObservableList<SongView> getPlaylistItems(){
+
+        ArrayList<PlaylistTracks> tracksFromAllPlaylist = new ArrayList<>();
+        ArrayList<Integer> trackIDSFromPlaylist = new ArrayList<>();
+        ArrayList<TrackData> tracksFromSelectedPlaylist = new ArrayList<>();
+        ObservableList<SongView> toAddToPlaylistView = FXCollections.observableArrayList();
+
+        PlaylistTracksService.selectAll(tracksFromAllPlaylist, database);
+
+        for(PlaylistTracks t : tracksFromAllPlaylist){
+            if(t.getPlaylistID() == selectedPlaylist.getPlaylistID()){
+                trackIDSFromPlaylist.add(t.getTrackID());
+            }
+        }
+
+        for(Integer i : trackIDSFromPlaylist){
+            tracksFromSelectedPlaylist.add(TrackDataService.selectByID(i, database));
+        }
+        for(TrackData t : tracksFromSelectedPlaylist){
+            ArtistData a = ArtistDataService.selectByID(t.getArtistID(), database);
+            toAddToPlaylistView.add(new SongView(t.getTrackName(), a.getArtistName(), formatTime(t.getLength())));
+        }
+
+        return toAddToPlaylistView;
+    }
+
+    private void updateSelectedPlaylist(){
+        ArrayList<PlaylistTracks> playlistTrackList = new ArrayList<>();
+        PlaylistTracksService.selectAll(playlistTrackList,database);
+
+        ArrayList<PlaylistTracks> selectedPlaylistList = new ArrayList<>();
+        ObservableList<SongView> playlistTableRows = FXCollections.observableArrayList();
+
+
+        for(PlaylistTracks t : playlistTrackList){
+            if(t.getPlaylistID()==selectedPlaylist.getPlaylistID()){
+                selectedPlaylistList.add(t);
+            }
+        }
+        for(PlaylistTracks t : selectedPlaylistList){
+            TrackData track = TrackDataService.selectByID(t.getTrackID(),database);
+
+            playlistTableRows.add(new SongView(track.getTrackName(),getArtistName(track.getTrackID()),formatTime(track.getLength())));
+        }
+        playlistTableView.setItems(playlistTableRows);
+        playlistTableView.refresh();
+    }
 
 }

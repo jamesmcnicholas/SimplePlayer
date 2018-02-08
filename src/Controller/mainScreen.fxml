@@ -3,11 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -15,6 +18,7 @@
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -22,87 +26,172 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
    <left>
-      <VBox prefHeight="291.0" prefWidth="151.0" style="-fx-background-color: #232426;" BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="121.0">
-               <children>
-                  <TextField fx:id="searchField" prefHeight="29.0" prefWidth="93.0" promptText="Search" style="-fx-background-radius: 0; -fx-background-color: #232426; -fx-text-fill: #000000;" />
-                  <Button fx:id="SearchButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#searchButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="✔" textFill="WHITE">
-                     <font>
-                        <Font name="Microsoft Tai Le Bold" size="12.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="closeSearchButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#closeSearchButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="❌" textFill="WHITE">
-                     <font>
-                        <Font name="Microsoft Tai Le Bold" size="12.0" />
-                     </font>
-                  </Button>
-               </children>
-            </HBox>
-            <Button fx:id="addSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addSongButtonPressed" prefHeight="25.0" prefWidth="135.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="ADD SONG" textFill="WHITE">
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font>
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-            </Button>
-            <Button fx:id="removeSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSongButtonPressed" prefHeight="25.0" prefWidth="143.0" style="-fx-background-color: #232426;" text="REMOVE SONG" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font></Button>
-            <Button fx:id="queueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#queueButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="ENQUEUE" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font></Button>
-            <Button fx:id="playNextButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#playNextButtonPressed" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: #232426;" text="PLAY NEXT" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font></Button>
-            <Button fx:id="addToPlaylistButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addToPlaylistButtonPressed" prefHeight="25.0" prefWidth="152.0" style="-fx-background-color: #232426;" text="ADD TO PLAYLIST" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font>
-            </Button>
-            <Slider fx:id="volumeSlider" max="1.0" prefHeight="34.0" prefWidth="121.0" value="1.0">
-               <VBox.margin>
-                  <Insets left="5.0" right="5.0" />
-               </VBox.margin>
-               <effect>
-                  <Shadow blurType="GAUSSIAN" color="WHITE" height="0.0" radius="0.0" width="0.0">
-                     <input>
-                        <Lighting>
-                           <bumpInput>
-                              <Shadow />
-                           </bumpInput>
-                           <light>
-                           </light>
-                        </Lighting>
-                     </input>
-                  </Shadow>
-               </effect>
-            </Slider>
-            <Label fx:id="volumeLabel" prefHeight="26.0" prefWidth="121.0" text="VOLUME:" textAlignment="CENTER" textFill="WHITE">
-               <font>
-                  <Font name="Microsoft Tai Le Bold" size="12.0" />
-               </font>
-               <padding>
-                  <Insets left="7.0" />
-               </padding>
-            </Label>
-         </children></VBox>
+      <TabPane prefHeight="291.0" prefWidth="152.0" BorderPane.alignment="CENTER">
+         <tabs>
+            <Tab text="Media">
+               <content>
+                  <VBox prefHeight="291.0" prefWidth="151.0" style="-fx-background-color: #232426;">
+                     <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="121.0">
+                           <children>
+                              <TextField fx:id="searchField" prefHeight="25.0" prefWidth="86.0" promptText="Search" style="-fx-background-color: #fffff;">
+                                 <HBox.margin>
+                                    <Insets top="10.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <Button fx:id="SearchButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#searchButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="✔" textFill="WHITE">
+                                 <font>
+                                    <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets top="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="closeSearchButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#closeSearchButtonPressed" prefHeight="25.0" prefWidth="29.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="❌" textFill="WHITE">
+                                 <font>
+                                    <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets top="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                           <VBox.margin>
+                              <Insets left="7.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <Button fx:id="addSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addSongButtonPressed" prefHeight="25.0" prefWidth="135.0" style="-fx-background-radius: 0; -fx-background-color: #232426;" text="ADD SONG" textFill="WHITE">
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="removeSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSongButtonPressed" prefHeight="25.0" prefWidth="143.0" style="-fx-background-color: #232426;" text="REMOVE SONG" textFill="WHITE">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="queueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#queueButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="ENQUEUE" textFill="WHITE">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="playNextButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#playNextButtonPressed" prefHeight="25.0" prefWidth="117.0" style="-fx-background-color: #232426;" text="PLAY NEXT" textFill="WHITE">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="addToPlaylistButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addToPlaylistButtonPressed" prefHeight="25.0" prefWidth="152.0" style="-fx-background-color: #232426;" text="ADD TO PLAYLIST" textFill="WHITE">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Slider fx:id="volumeSlider" max="1.0" value="1.0">
+                           <effect>
+                              <Shadow blurType="GAUSSIAN" color="WHITE" height="0.0" radius="0.0" width="0.0">
+                                 <input>
+                                    <Lighting>
+                                       <bumpInput>
+                                          <Shadow />
+                                       </bumpInput>
+                                       <light>
+                                       </light>
+                                    </Lighting>
+                                 </input>
+                              </Shadow>
+                           </effect>
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Slider>
+                        <Label fx:id="volumeLabel" prefHeight="26.0" prefWidth="121.0" text="VOLUME:" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Microsoft Tai Le Bold" size="12.0" />
+                           </font>
+                           <padding>
+                              <Insets left="7.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+            <Tab text="Playlists">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="262.0" prefWidth="148.0">
+                     <children>
+                        <VBox prefHeight="291.0" prefWidth="151.0" style="-fx-background-color: #232426;">
+                           <children>
+                              <Label alignment="BOTTOM_CENTER" prefHeight="17.0" prefWidth="200.0" text="SELECT PLAYLIST" textFill="WHITE">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <ChoiceBox fx:id="playlistChoiceBox" prefWidth="150.0" style="-fx-background-color: #FFFFFF;">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </ChoiceBox>
+                              <Button fx:id="addSelectedSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#addSelectedSongButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="ADD SELECTED SONG" textFill="WHITE">
+                                 <font>
+                                    <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="removeSelectedSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSelectedSongButtonPressec" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="REMOVE SELECTED" textFill="WHITE">
+                                 <font>
+                                    <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="deletePlaylistButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#deletePlaylistButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="DELETE PLAYLIST" textFill="WHITE">
+                                 <font>
+                                    <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="121.0">
+                                 <children>
+                                    <Button fx:id="newPlaylistButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#newPlaylistButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="NEW PLAYLIST" textFill="WHITE">
+                                       <font>
+                                          <Font name="Microsoft Tai Le Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <TextField fx:id="playlistNameField" prefHeight="29.0" prefWidth="160.0" promptText="Playlist name" style="-fx-background-radius: 0; -fx-background-color: #232426; -fx-text-fill: #000000;">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+         </tabs>
+      </TabPane>
    </left>
    <bottom>
       <VBox prefHeight="84.0" prefWidth="704.0" style="-fx-background-color: #696969;" BorderPane.alignment="CENTER">
@@ -172,13 +261,32 @@
                   <Label fx:id="nameDisplayLabel" alignment="CENTER" prefHeight="36.0" prefWidth="583.0" style="-fx-background-color: #161719;" text="Music Library - *User's Name*" textFill="WHITE" />
                </children>
             </HBox>
-            <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0">
-              <columns>
-                 <TableColumn fx:id="NameColumn" editable="false" prefWidth="286.0" sortable="false" text="Name" />
-                <TableColumn fx:id="ArtistColumn" editable="false" minWidth="0.0" prefWidth="222.0" sortable="false" text="Artist" />
-                  <TableColumn fx:id="LengthColumn" editable="false" prefWidth="73.0" sortable="false" text="Length" />
-              </columns>
-            </TableView>
+            <TabPane fx:id="tableTabPane">
+               <tabs>
+                  <Tab closable="false" text="Library">
+                     <content>
+                        <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0">
+                          <columns>
+                             <TableColumn fx:id="NameColumn" editable="false" prefWidth="286.0" sortable="false" text="Name" />
+                            <TableColumn fx:id="ArtistColumn" editable="false" minWidth="0.0" prefWidth="222.0" sortable="false" text="Artist" />
+                              <TableColumn fx:id="LengthColumn" editable="false" prefWidth="73.0" sortable="false" text="Length" />
+                          </columns>
+                        </TableView>
+                     </content>
+                  </Tab>
+                  <Tab fx:id="playlistTab" closable="false" text="Playlist">
+                     <content>
+                        <TableView fx:id="playlistTableView" prefHeight="232.0" prefWidth="551.0">
+                           <columns>
+                              <TableColumn fx:id="playlistNameColumn" editable="false" prefWidth="286.0" sortable="false" text="Name" />
+                              <TableColumn fx:id="playlistArtistColumn" editable="false" minWidth="0.0" prefWidth="209.0" sortable="false" text="Artist" />
+                              <TableColumn fx:id="playlistLengthColumn" editable="false" prefWidth="58.0" sortable="false" text="Length" />
+                           </columns>
+                        </TableView>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
          </children>
       </VBox>
    </center>

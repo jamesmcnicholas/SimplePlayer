@@ -10,7 +10,7 @@ import static Model.DatabaseConnection.deleteFromTable;
 public class PlaylistTracksService {
     
     public static void selectAll(List<PlaylistTracks> targetList, DatabaseConnection database){
-        PreparedStatement statement = database.newStatement("SELECT playlistID, trackID, FROM PlaylistTracks ORDER BY playlistID");
+        PreparedStatement statement = database.newStatement("SELECT playlistID, trackID FROM PlaylistTracks ORDER BY playlistID");
         try{
             if(statement != null){
                 ResultSet results = database.executeQuery(statement);
@@ -32,17 +32,18 @@ public class PlaylistTracksService {
 
     public static PlaylistTracks selectByID(int id, DatabaseConnection database){
         PlaylistTracks result = null;
-        PreparedStatement statement = database.newStatement("SELECT playlistID, trackID, FROM PlaylistTracks WHERE id = ?");
+        PreparedStatement statement = database.newStatement("SELECT playlistID, trackID FROM PlaylistTracks WHERE playlistID = ?");
         try {
             if (statement != null) {
                 statement.setInt(1, id);
                 ResultSet results = database.executeQuery(statement);
 
                 if (results!=null) {
-
-                    result = new PlaylistTracks(
-                            results.getInt("playlistID"),
-                            results.getInt("trackID"));
+                    while (results.next()) {
+                        result = new PlaylistTracks(
+                                results.getInt("playlistID"),
+                                results.getInt("trackID"));
+                    }
                 }
             }
         } catch (SQLException resultsException) {
