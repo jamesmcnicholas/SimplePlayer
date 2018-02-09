@@ -157,7 +157,7 @@ public class mainController{
                     selectedPlaylist = p;
                     playlistTab.setText("Playlist: " + selectedPlaylist.getPlaylistName());
                     found = true;
-                    playlistTableView.setItems(getPlaylistItems());
+                    updateSelectedPlaylist();
                     break;
                 }
             }
@@ -356,21 +356,29 @@ public class mainController{
 
     @FXML protected void deletePlaylistButtonPressed(ActionEvent event){
 
-        // Clears the database of the track records the the playlist
+        // Selects all playlist tracks
         ArrayList<PlaylistTracks> playlistTracks = new ArrayList<>();
         PlaylistTracksService.selectAll(playlistTracks,database);
+
+        // Searches for tracks relating to the chosen playlist, and purges them
         for(PlaylistTracks p: playlistTracks){
             if(p.getPlaylistID()==selectedPlaylist.getPlaylistID()){
                 PlaylistTracksService.deleteByID(p.getPlaylistID(),database);
             }
         }
-        //Deletes the playlist
+        // Deletes the playlist from the database
         PlaylistsService.deleteByID(selectedPlaylist.getPlaylistID(),database);
 
-        allPlaylists.remove(selectedPlaylist.getPlaylistID());
-        playlistNames.remove(selectedPlaylist.getPlaylistID());
-        playlistTableView.refresh();
+        // Removes the playlist from the choiceBox list
+        playlistNames.remove(playlistNames.indexOf(selectedPlaylist.getPlaylistName()));
         playlistChoiceBox.setItems(playlistNames);
+
+        // Resets the selected playlist and playlist tab to default values
+        selectedPlaylist=null;
+        playlistTab.setText("Select a Playlist");
+
+        // Resets the playlistTableView
+        updateSelectedPlaylist();
     }
 
     @FXML protected void addSelectedSongButtonPressed(ActionEvent event) {
@@ -381,8 +389,18 @@ public class mainController{
         updateSelectedPlaylist();
     }
 
-    @FXML protected void removeSelectedSongButtonPressec(ActionEvent event){
-        System.out.println("Removed Song");
+    @FXML protected void removeSelectedSongButtonPressed(ActionEvent event){
+        ArrayList<PlaylistTracks> playlistTracks = new ArrayList<>();
+        PlaylistTracksService.selectAll(playlistTracks,database);
+        TrackData selected = getTrackFromName(playlistTableView.getSelectionModel().getSelectedItem().getName());
+
+        for(PlaylistTracks pt : playlistTracks){
+            if(pt.getPlaylistID()==selectedPlaylist.getPlaylistID()){
+                if(pt.getTrackID()==selected.getTrackID()){
+                    PlaylistTracksService.deleteRow(pt,database);
+                }
+            }
+        }
     }
 
 
@@ -649,51 +667,29 @@ public class mainController{
             return (int)(Math.random() * range) + min;
     }
 
-    //Gets rows for playlist TableView
-    private ObservableList<SongView> getPlaylistItems(){
-
-        ArrayList<PlaylistTracks> tracksFromAllPlaylist = new ArrayList<>();
-        ArrayList<Integer> trackIDSFromPlaylist = new ArrayList<>();
-        ArrayList<TrackData> tracksFromSelectedPlaylist = new ArrayList<>();
-        ObservableList<SongView> toAddToPlaylistView = FXCollections.observableArrayList();
-
-        PlaylistTracksService.selectAll(tracksFromAllPlaylist, database);
-
-        for(PlaylistTracks t : tracksFromAllPlaylist){
-            if(t.getPlaylistID() == selectedPlaylist.getPlaylistID()){
-                trackIDSFromPlaylist.add(t.getTrackID());
-            }
-        }
-
-        for(Integer i : trackIDSFromPlaylist){
-            tracksFromSelectedPlaylist.add(TrackDataService.selectByID(i, database));
-        }
-        for(TrackData t : tracksFromSelectedPlaylist){
-            ArtistData a = ArtistDataService.selectByID(t.getArtistID(), database);
-            toAddToPlaylistView.add(new SongView(t.getTrackName(), a.getArtistName(), formatTime(t.getLength())));
-        }
-
-        return toAddToPlaylistView;
-    }
-
     private void updateSelectedPlaylist(){
         ArrayList<PlaylistTracks> playlistTrackList = new ArrayList<>();
-        PlaylistTracksService.selectAll(playlistTrackList,database);
-
         ArrayList<PlaylistTracks> selectedPlaylistList = new ArrayList<>();
         ObservableList<SongView> playlistTableRows = FXCollections.observableArrayList();
 
+        // Selects every track from the PlaylistTracks table
+        PlaylistTracksService.selectAll(playlistTrackList,database);
 
+        // Searches for tracks matching the selected playlist
         for(PlaylistTracks t : playlistTrackList){
             if(t.getPlaylistID()==selectedPlaylist.getPlaylistID()){
                 selectedPlaylistList.add(t);
             }
         }
+
+        // Creates new TrackData objects from matching items
         for(PlaylistTracks t : selectedPlaylistList){
             TrackData track = TrackDataService.selectByID(t.getTrackID(),database);
 
             playlistTableRows.add(new SongView(track.getTrackName(),getArtistName(track.getTrackID()),formatTime(track.getLength())));
         }
+
+        // Sets up the TableView with the new values
         playlistTableView.setItems(playlistTableRows);
         playlistTableView.refresh();
     }

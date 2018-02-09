@@ -154,7 +154,7 @@
                                     <Insets bottom="5.0" />
                                  </VBox.margin>
                               </Button>
-                              <Button fx:id="removeSelectedSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSelectedSongButtonPressec" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="REMOVE SELECTED" textFill="WHITE">
+                              <Button fx:id="removeSelectedSongButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#removeSelectedSongButtonPressed" prefHeight="25.0" prefWidth="230.0" style="-fx-background-color: #232426;" text="REMOVE SELECTED" textFill="WHITE">
                                  <font>
                                     <Font name="Microsoft Tai Le Bold" size="12.0" />
                                  </font>

@@ -54,22 +54,13 @@ public class PlaylistTracksService {
 
 
     public static void save(PlaylistTracks itemToSave, DatabaseConnection database){
-        PlaylistTracks existingItem = null;
-        if (itemToSave.getPlaylistID()!= 0) existingItem = selectByID(itemToSave.getPlaylistID(), database);
 
         try {
-            if (existingItem == null) {
                 PreparedStatement statement = database.newStatement("INSERT INTO PlaylistTracks (playlistID, trackID) VALUES (?, ?)");
                 statement.setInt(1, itemToSave.getPlaylistID());
                 statement.setInt(2, itemToSave.getTrackID());
                 database.executeUpdate(statement);
-            }
-            else {
-                PreparedStatement statement = database.newStatement("UPDATE PlaylistTracks SET playlistID, trackID,= ?, WHERE playlistID = ?");
-                statement.setInt(1, itemToSave.getPlaylistID());
-                statement.setInt(2, itemToSave.getTrackID());
-                database.executeUpdate(statement);
-            }
+
         } catch (SQLException resultsException) {
             System.out.println("Database saving error: " + resultsException.getMessage());
         }
@@ -77,5 +68,15 @@ public class PlaylistTracksService {
     public static void deleteByID(int id, DatabaseConnection database){
         PreparedStatement statement = database.newStatement("DELETE FROM PlaylistTracks WHERE playlistID = ?");
         deleteFromTable(id,database,statement);
+    }
+
+    public static void deleteRow(PlaylistTracks itemToDelete, DatabaseConnection database){
+        try{
+            PreparedStatement statement = database.newStatement("DELETE FROM PlaylistTracks WHERE playlistID = ? AND trackID = ?");
+            statement.setInt(1,itemToDelete.getPlaylistID());
+            statement.setInt(2,itemToDelete.getTrackID());
+        } catch (SQLException resultsException){
+            System.out.println("Database deletion error: "+resultsException.getMessage());
+        }
     }
 }

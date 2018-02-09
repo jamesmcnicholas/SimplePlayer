@@ -23,17 +23,14 @@ import javax.xml.bind.DatatypeConverter;
 public class loginController {
 
     //Initialising variables
-    private DatabaseConnection database;
+    private DatabaseConnection database = Main.database;
     private ArrayList<UserData> userList = new ArrayList<>();
 
     //FXML element declarations
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
 
-    //FXML methods for buttons
-    @FXML protected void forgotPasswordButtonPress(ActionEvent event){
-        System.out.println("forgot PRESSED");
-    }
+
     @FXML protected void createAccountButtonPress(ActionEvent event) {
         //Selects all users from the database
         UserDataService.selectAll(userList, database);
@@ -126,7 +123,4 @@ public class loginController {
         }
     }
 
-    public void initialize(){
-        database = new DatabaseConnection("SQL/SimplePlayer.db");
-    }
 }
