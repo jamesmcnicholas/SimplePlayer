@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.mainController">
    <left>
       <TabPane prefHeight="291.0" prefWidth="152.0" BorderPane.alignment="CENTER">
          <tabs>
@@ -208,10 +208,15 @@
                   </Label>
                   <Slider fx:id="progressBar" prefHeight="14.0" prefWidth="628.0">
                      <effect>
-                        <Lighting bumpInput="$null">
-                           <light>
-                           </light>
-                        </Lighting>
+                        <Shadow blurType="GAUSSIAN" color="WHITE" height="1.0" radius="0.0" width="0.0">
+                           <input>
+                              <Lighting bumpInput="$null">
+                                 <light>
+                                    <Light.Distant />
+                                 </light>
+                              </Lighting>
+                           </input>
+                        </Shadow>
                      </effect>
                   </Slider>
                   <Label fx:id="lengthLabel" text="10:00" textFill="WHITE">
@@ -268,8 +273,8 @@
                         <TableView fx:id="tableView" prefHeight="250.0" prefWidth="559.0">
                           <columns>
                              <TableColumn fx:id="NameColumn" editable="false" prefWidth="286.0" sortable="false" text="Name" />
-                            <TableColumn fx:id="ArtistColumn" editable="false" minWidth="0.0" prefWidth="222.0" sortable="false" text="Artist" />
-                              <TableColumn fx:id="LengthColumn" editable="false" prefWidth="73.0" sortable="false" text="Length" />
+                            <TableColumn fx:id="ArtistColumn" editable="false" minWidth="0.0" prefWidth="209.0" sortable="false" text="Artist" />
+                              <TableColumn fx:id="LengthColumn" editable="false" prefWidth="57.0" sortable="false" text="Length" />
                           </columns>
                         </TableView>
                      </content>

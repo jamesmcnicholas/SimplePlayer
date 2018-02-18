@@ -200,7 +200,7 @@ public class mainController{
             if (playerInitialised && currentSong.getTrackName().equals(getSelectedRow().getName())) {
                 if (!paused) {
                     player.pause();
-                    System.out.println("Paused");
+                    System.out.println("Paused"); //todo.Change button text
                     paused = true;
 
                 } else {
@@ -251,8 +251,7 @@ public class mainController{
                     addToTable(getMetadata(f));
                     tableView.refresh();
                 }catch (Exception e){
-                    System.out.println("Adding failed");
-                    System.out.println(e.getMessage());
+                    errorBox(e.getMessage());
                 }
             }
         }
@@ -274,7 +273,7 @@ public class mainController{
                 System.out.println(i.getMessage());
             }
         }else{
-            System.out.println("Select a song first");
+            errorBox("Select a song first");
         }
     }
 
@@ -428,7 +427,7 @@ public class mainController{
             TrackDataService.save(track,database);
             System.out.println("Track successfully added!");
         }else{
-            System.out.println("Track is already in library");
+            errorBox("Track is already in library");
         }
     }
 
@@ -692,6 +691,15 @@ public class mainController{
         // Sets up the TableView with the new values
         playlistTableView.setItems(playlistTableRows);
         playlistTableView.refresh();
+    }
+
+    public static void errorBox(String error){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText("An error occured");
+        alert.setContentText(error);
+
+        alert.showAndWait();
     }
 
 }
