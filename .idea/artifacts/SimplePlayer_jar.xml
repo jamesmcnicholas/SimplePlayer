@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SimplePlayer.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SimplePlayer_jar</output-path>
+    <root id="archive" name="MusicPlayer.jar">
+      <element id="module-output" name="SimplePlayer" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/commons-io-2.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/sqlite-jdbc-3.8.11.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/tika-app-1.17.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

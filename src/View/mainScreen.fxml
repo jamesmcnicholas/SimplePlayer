@@ -34,7 +34,7 @@
                      <children>
                         <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="121.0">
                            <children>
-                              <TextField fx:id="searchField" prefHeight="25.0" prefWidth="86.0" promptText="Search" style="-fx-background-color: #fffff;">
+                              <TextField fx:id="searchField" prefHeight="25.0" prefWidth="86.0" promptText="Search" style="-fx-background-color: #ffffff;">
                                  <HBox.margin>
                                     <Insets top="10.0" />
                                  </HBox.margin>
@@ -212,7 +212,6 @@
                            <input>
                               <Lighting bumpInput="$null">
                                  <light>
-                                    <Light.Distant />
                                  </light>
                               </Lighting>
                            </input>

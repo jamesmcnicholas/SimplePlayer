@@ -12,7 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import java.security.MessageDigest;
@@ -100,7 +102,8 @@ public class loginController {
         try {
             //Creates a new FXMLLoader object and loads in the main controller
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("mainScreen.fxml"));
+            URL url = new File("src/View/mainScreen.fxml").toURI().toURL();
+            loader.setLocation(url);
             Parent mainScreenParent = loader.load();
 
             //Sets up the scene with the elements from the FXML file
