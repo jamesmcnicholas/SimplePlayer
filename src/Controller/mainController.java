@@ -633,11 +633,12 @@ public class mainController{
                 //If not looping or shuffling, get the next song and play it
                 index = tableView.getSelectionModel().getSelectedIndex();
                 if((index+1<tableView.getItems().size())){
-                    tableView.getSelectionModel().select(index + 1);
+                    index++;
                 } else{
                     // If the item is out of range, resets it to the first
-                    tableView.getSelectionModel().select(0);
+                    index=0;
                 }
+                tableView.getSelectionModel().select(index);
             } else if (loop) {
                 //If loop enabled, reselect the current row and play again
                 index = tableView.getSelectionModel().getSelectedIndex();
